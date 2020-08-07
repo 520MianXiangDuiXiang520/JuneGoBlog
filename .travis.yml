@@ -10,4 +10,5 @@ after_script:
   - git config user.email "15364968962"
   - git add -A
   - git commit -m ":construction_worker:update from Travis CI"
-  - git push --force --quiet "https://${GitHub_Token}@${GitHub_Repo}" HEAD:master
+  # - git push --force --quiet "https://${GitHub_Token}@${GitHub_Repo}" HEAD:master
+  - git push --quiet "https://${GitHub_Token}@${GitHub_Repo}" HEAD:master
