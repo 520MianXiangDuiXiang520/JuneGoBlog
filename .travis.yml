@@ -3,7 +3,7 @@ go:
   - '1.14'
 
 script:
-  - make build && psw && ls
+  - make build && ls
 
 after_script:
   - git config user.name "520MianXiangDuiXiang520"
