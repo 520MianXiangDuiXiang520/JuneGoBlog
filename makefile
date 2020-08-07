@@ -1,2 +1,2 @@
 build:
-    go build -o JuneGoBlog -v
+    go build -o JuneGoBlog main.go
