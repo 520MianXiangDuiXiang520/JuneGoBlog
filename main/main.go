@@ -1,4 +1,4 @@
-package JuneGoBlog
+package main
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,5 +7,5 @@ import (
 func main() {
     engine := gin.Default()
     defer engine.Run()
-    Routes(engine)
+    Register(engine)
 }
