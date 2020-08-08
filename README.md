@@ -7,4 +7,6 @@
 <a href="https://gitmoji.carloscuesta.me">
   <img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square" alt="Gitmoji">
 </a>
+<a href='https://coveralls.io/github/520MianXiangDuiXiang520/JuneGoBlog?branch=master'><img src='https://coveralls.io/repos/github/520MianXiangDuiXiang520/JuneGoBlog/badge.svg?branch=master' alt='Coverage Status' /></a>
+
 </centre>
