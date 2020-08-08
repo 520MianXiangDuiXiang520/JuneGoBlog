@@ -1,7 +1,11 @@
 package JuneGoBlog
 
-import "fmt"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("Hello JuneGoBlog")
+    engine := gin.Default()
+    defer engine.Run()
+    Routes(engine)
 }
