@@ -2,8 +2,12 @@ language: go
 go:
   - '1.14'
 
+before_install:
+  - go get github.com/mattn/goveralls
+
 script:
   - ls && make build && ls
+  - goveralls -service=travis-ci
 
 deploy:
   provider: pages
