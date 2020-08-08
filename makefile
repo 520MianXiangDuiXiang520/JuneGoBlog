@@ -1,2 +1,2 @@
 build:
-	go build -o JuneGoBlog main.go
+	go build -o bin/JuneGoBlog main.go routes.go
