@@ -3,7 +3,7 @@ go:
   - '1.14'
 
 script:
-  - make build && ls
+  - ls && make build && ls
 
 deploy:
   provider: pages
