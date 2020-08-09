@@ -1,18 +1,15 @@
 package main
 
 import (
-	"JuneGoBlog/src/admin"
-	"JuneGoBlog/src/article"
-	"JuneGoBlog/src/tag"
-	"JuneGoBlog/src/talking"
+	"JuneGoBlog/src/routes"
 	"JuneGoBlog/src/utils"
 	"github.com/gin-gonic/gin"
 )
 
-
 func Register(c *gin.Engine) {
-	utils.HandlerRoute(c, "api/article", article.Register)
-	utils.HandlerRoute(c, "api/tag", tag.Register)
-	utils.HandlerRoute(c, "api/talking", talking.Register)
-	utils.HandlerRoute(c, "api/admin", admin.Register)
+	utils.HandlerRoute(c, "api/article", routes.ArticleRegister)
+	utils.HandlerRoute(c, "api/tag", routes.TagRegister)
+	utils.HandlerRoute(c, "api/talking", routes.TalkingRegister)
+	utils.HandlerRoute(c, "api/admin", routes.AdminRegister)
+
 }

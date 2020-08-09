@@ -1,8 +1,7 @@
-package article
+package check
 
 import (
 	"JuneGoBlog/src/message"
-	"JuneGoBlog/src/message/article"
 	"JuneGoBlog/src/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -11,7 +10,7 @@ import (
 )
 
 func CheckList(ctx *gin.Context) (utils.RespHeader, error) {
-	req := new(article.ListReq)
+	req := new(message.ListReq)
 	var resp *message.BaseRespHeader
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
