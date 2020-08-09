@@ -3,6 +3,7 @@ package main
 import (
 	"JuneGoBlog/src/dao"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func init() {
@@ -16,5 +17,5 @@ func main() {
 	engine := gin.Default()
 	defer engine.Run()
 	Register(engine)
-	defer dao.DB.Close()
+	defer log.Println("end。。。。")
 }

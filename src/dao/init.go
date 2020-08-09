@@ -2,9 +2,6 @@ package dao
 
 import (
 	"JuneGoBlog/src/utils"
-	"database/sql"
-	"errors"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"log"
@@ -34,5 +31,6 @@ func InitDB() error {
 		log.Println("Open DB Error!!!")
 		return err
 	}
+	log.Println("============== MySQL Connect Success ==============")
 	return nil
 }
