@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func CheckList(ctx *gin.Context) (utils.RespHeader, error) {
+func ListCheck(ctx *gin.Context) (utils.RespHeader, error) {
 	req := new(message.ListReq)
 	var resp *message.BaseRespHeader
 	err := ctx.ShouldBindJSON(&req)

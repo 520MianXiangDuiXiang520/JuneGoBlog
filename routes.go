@@ -11,5 +11,6 @@ func Register(c *gin.Engine) {
 	utils.HandlerRoute(c, "api/tag", routes.TagRegister)
 	utils.HandlerRoute(c, "api/talking", routes.TalkingRegister)
 	utils.HandlerRoute(c, "api/admin", routes.AdminRegister)
+	utils.HandlerRoute(c, "api/friendship", routes.FriendShipRoutes)
 
 }

@@ -5,25 +5,19 @@ import (
 	"net/http"
 )
 
-type RespHeader interface {}
+type RespHeader interface{}
 
-type LogicContext struct {
-	CheckFunc func(ctx *gin.Context) (RespHeader, error)
-	LogicFunc func(ctx *gin.Context) RespHeader
-}
+type CheckFunc func(ctx *gin.Context) (RespHeader, error)
+type LogicFunc func(ctx *gin.Context) RespHeader
 
-func (lc *LogicContext) do() gin.HandlerFunc {
-	 return func(context *gin.Context) {
+func EasyHandler(cf CheckFunc, lf LogicFunc) gin.HandlerFunc {
+	return func(context *gin.Context) {
 		var resp interface{}
-		if checkResp, err := lc.CheckFunc(context); err != nil {
+		if checkResp, err := cf(context); err != nil {
 			resp = checkResp
 		} else {
-			resp = lc.LogicFunc(context)
+			resp = lf(context)
 		}
 		context.JSON(http.StatusOK, resp)
 	}
-}
-
-func EasyHandler(lc *LogicContext) gin.HandlerFunc {
-	return lc.do()
 }

@@ -8,9 +8,9 @@ import (
 )
 
 func ArticleRegister(rg *gin.RouterGroup) {
-	rg.POST("/list", utils.EasyHandler(&utils.LogicContext{CheckFunc: check.CheckList, LogicFunc: server.ListLogic}))
-	rg.POST("/add", utils.EasyHandler(&utils.LogicContext{CheckFunc: check.CheckList, LogicFunc: server.ListLogic}))
-	rg.POST("/update", utils.EasyHandler(&utils.LogicContext{CheckFunc: check.CheckList, LogicFunc: server.ListLogic}))
-	rg.POST("/delete", utils.EasyHandler(&utils.LogicContext{CheckFunc: check.CheckList, LogicFunc: server.ListLogic}))
-	rg.POST("/detail", utils.EasyHandler(&utils.LogicContext{CheckFunc: check.CheckList, LogicFunc: server.ListLogic}))
+	rg.POST("/list", utils.EasyHandler(check.ListCheck, server.ListLogic))
+	rg.POST("/add", utils.EasyHandler(check.ListCheck, server.ListLogic))
+	rg.POST("/update", utils.EasyHandler(check.ListCheck, server.ListLogic))
+	rg.POST("/delete", utils.EasyHandler(check.ListCheck, server.ListLogic))
+	rg.POST("/detail", utils.EasyHandler(check.ListCheck, server.ListLogic))
 }
