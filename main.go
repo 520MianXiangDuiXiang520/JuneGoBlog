@@ -1,7 +1,6 @@
 package main
 
 import (
-	"JuneGoBlog/src/dao"
 	"github.com/gin-gonic/gin"
 )
 
