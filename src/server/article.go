@@ -4,13 +4,12 @@ import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
 	"JuneGoBlog/src/message"
-	"JuneGoBlog/src/utils"
 	"github.com/gin-gonic/gin"
 )
 
-func ListLogic(ctx *gin.Context) utils.RespHeader {
-	var req message.ListReq
-	var resp *message.ListResp
+func ListLogic(ctx *gin.Context, req interface{}) interface{} {
+
+	var resp *message.ArticleListResp
 
 	_ = ctx.ShouldBindJSON(&req)
 	// TODO: dao
@@ -20,6 +19,6 @@ func ListLogic(ctx *gin.Context) utils.RespHeader {
 		CreateTime: 12345678, Abstract: "xxxx", Text: "Hello Go", ReadingAmount: 10,
 		Tags: []dao.TagInfo{}}
 	articleList = append(articleList, articleInfo)
-	resp = &message.ListResp{Header: consts.SuccessHead, ArticleList: articleList, Total: 1}
+	resp = &message.ArticleListResp{Header: consts.SuccessRespHeader, ArticleList: articleList, Total: 1}
 	return resp
 }

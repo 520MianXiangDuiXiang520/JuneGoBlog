@@ -1,22 +1,27 @@
 package utils
 
 import (
+	"JuneGoBlog/src/consts"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
-type RespHeader interface{}
+type CheckFunc func(ctx *gin.Context, req interface{}) (interface{}, error)
+type LogicFunc func(ctx *gin.Context, req interface{}) interface{}
 
-type CheckFunc func(ctx *gin.Context) (RespHeader, error)
-type LogicFunc func(ctx *gin.Context) RespHeader
-
-func EasyHandler(cf CheckFunc, lf LogicFunc) gin.HandlerFunc {
+func EasyHandler(cf CheckFunc, lf LogicFunc, req interface{}) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var resp interface{}
-		if checkResp, err := cf(context); err != nil {
-			resp = checkResp
+		if err := context.BindJSON(req); err != nil {
+			log.Printf("EasyHandler: BindJSON ERROR!!!")
+			resp = consts.ParamErrorRespHeader
 		} else {
-			resp = lf(context)
+			if checkResp, err := cf(context, req); err != nil {
+				resp = checkResp
+			} else {
+				resp = lf(context, req)
+			}
 		}
 		context.JSON(http.StatusOK, resp)
 	}

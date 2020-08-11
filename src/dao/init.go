@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"JuneGoBlog/src/utils"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"log"
@@ -22,7 +21,7 @@ type mysqlStruct struct {
 func InitDB() error {
 	var err error
 	var ms mysqlStruct
-	utils.Load("../../secret.ini", "mysql", &ms)
+	Load("../../secret.ini", "mysql", &ms)
 	s := []string{ms.User, ":", ms.Password, "@tcp(", ms.Ip, ":", strconv.Itoa(ms.Port), ")/",
 		ms.DbName, "?charset=utf8&parseTime=True&loc=Local"}
 	connStr := strings.Join(s, "")
