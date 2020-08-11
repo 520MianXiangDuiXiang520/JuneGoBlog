@@ -2,16 +2,15 @@ package dao
 
 import "testing"
 
-func TestAddFriendship(t *testing.T) {
-	// test FriendshipLink has ImgLink and Intro
-	err := AddFriendship(&FriendShipLink{
-		SiteLink: "https://draveness.me/",
-		SiteName: "面向信仰编程",
-		ImgLink: "https://draveness.me/images/draven-logo.png",
-		Intro: "面向信仰编程",
-	})
-	if err != nil {
-		t.Error(err)
+func TestQueryAllFriendLink(t *testing.T) {
+	var fls []FriendShipLink
+	if err := QueryAllFriendLink(&fls); err != nil {
+		t.Error("Error!")
 	}
-	// test FriendshipLink without ImgLink and Intro
+	if len(fls) <= 0 {
+		t.Error("没拿到")
+	}
+	if fls[0].SiteName == "" {
+		t.Error("Nil")
+	}
 }

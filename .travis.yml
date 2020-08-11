@@ -5,9 +5,19 @@ go:
 before_install:
   - go get github.com/mattn/goveralls
 
+before_script:
+  - touch secret.ini
+  - echo "[mysql]" >> secret.ini
+  - echo "user=$MySQL_USER" >> secret.ini
+  - echo "password=$MySQL_PASSWORD" >> secret.ini
+  - echo "ip=$MySQL_IP" >> secret.ini
+  - echo "port=$MySQL_PORT" >> secret.ini
+  - echo "dbname=$MySQL_DBNAME" >> secret.ini
+
 script:
   - ls && make build && ls
   - goveralls -service=travis-ci
+  
 
 deploy:
   provider: pages
@@ -17,3 +27,6 @@ deploy:
   target_branch: master        # Add this line - To push into GitHub master branch
   on:
     branch: master            # Your GitHub repo default branch
+
+after_script:
+  rm -rf secret.ini
