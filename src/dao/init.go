@@ -18,6 +18,13 @@ type mysqlStruct struct {
 	Ip       string `ini:"ip"`
 }
 
+func init() {
+	err := InitDB()
+	if err != nil {
+		return
+	}
+}
+
 func InitDB() error {
 	var err error
 	var ms mysqlStruct
