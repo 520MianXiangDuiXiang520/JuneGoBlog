@@ -21,3 +21,11 @@ func FriendAddCheck(ctx *gin.Context, req interface{}) (interface{}, error) {
 	}
 	return nil, nil
 }
+
+func FriendDeleteCheck(ctx *gin.Context, req interface{}) (interface{}, error) {
+	reqD := req.(*message.FriendDeleteReq)
+	if reqD.ID <= 0 {
+		return consts.ParamErrorRespHeader, errors.New("请求参数错误")
+	}
+	return nil, nil
+}

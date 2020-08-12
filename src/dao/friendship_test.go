@@ -12,3 +12,7 @@ func TestQueryAllFriendLink(t *testing.T) {
 		t.Error("NO Result Query!!")
 	}
 }
+
+func TestAddFriendship(t *testing.T) {
+
+}

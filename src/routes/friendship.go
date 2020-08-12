@@ -9,6 +9,10 @@ import (
 )
 
 func FriendShipRoutes (rg *gin.RouterGroup) {
-	rg.POST("list/", utils.EasyHandler(check.FriendShipListCheck, server.FriendShipListLogic, &message.FriendAddReq{}))
-	rg.POST("add/", utils.EasyHandler(check.FriendAddCheck, server.FriendAddLogic, &message.FriendAddReq{}))
-}
+	rg.POST("list/", utils.EasyHandler(check.FriendShipListCheck,
+		server.FriendShipListLogic, &message.FriendAddReq{}))
+	rg.POST("add/", utils.EasyHandler(check.FriendAddCheck,
+		server.FriendAddLogic, &message.FriendAddReq{}))
+	rg.POST("delete/", utils.EasyHandler(check.FriendShipListCheck,
+		server.FriendDeleteLogic, &message.FriendDeleteReq{}))
+	}

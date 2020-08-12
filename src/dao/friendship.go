@@ -1,6 +1,9 @@
 package dao
 
-import "log"
+import (
+
+	"log"
+)
 
 // 查询所有的友链信息
 func QueryAllFriendLink(fl *[]FriendShipLink) error {
@@ -24,4 +27,25 @@ func AddFriendship(fs *FriendShipLink) error {
 	}()
 	err = tx.Create(&fs).Error
 	return err
+}
+
+func DeleteFriendshipByID(fid int) error {
+	tx := DB.Begin()
+	var err error
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			log.Printf("DeleteFriendshipByID DB.Begin() Error, ID is [%v]\n\n", err)
+		}
+		tx.Commit()
+	}()
+
+	deleteFri := tx.Model(&FriendShipLink{}).Where("id = ?", fid)
+	var count int
+	deleteFri.Count(&count)
+	if count <= 0 {
+		log.Printf("No This Friendship")
+		return NoRecordError
+	}
+	return tx.Where("id = ?", fid).Delete(&FriendShipLink{}).Error
 }

@@ -13,7 +13,7 @@ type LogicFunc func(ctx *gin.Context, req interface{}) interface{}
 func EasyHandler(cf CheckFunc, lf LogicFunc, req interface{}) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var resp interface{}
-		if err := context.BindJSON(req); err != nil {
+		if err := context.ShouldBindJSON(&req); err != nil {
 			log.Printf("EasyHandler: BindJSON ERROR!!!")
 			resp = consts.ParamErrorRespHeader
 		} else {

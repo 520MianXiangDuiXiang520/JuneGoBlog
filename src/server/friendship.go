@@ -43,3 +43,19 @@ func FriendAddLogic(ctx *gin.Context, re interface{}) interface{} {
 	resp.Header = consts.SuccessRespHeader
 	return resp
 }
+
+// 删除友链
+
+func FriendDeleteLogic(ctx *gin.Context, req interface{}) interface{} {
+	reqD := req.(*message.FriendDeleteReq)
+	var resp  message.FriendAddResp
+	if err := dao.DeleteFriendshipByID(reqD.ID); err != nil {
+		if err == dao.NoRecordError {
+			return consts.ParamErrorRespHeader
+		}
+		log.Printf("DELETE Friendship ERROR ! id = [%d]", reqD.ID)
+		return consts.SystemErrorRespHeader
+	}
+	resp.Header = consts.SuccessRespHeader
+	return resp
+}
