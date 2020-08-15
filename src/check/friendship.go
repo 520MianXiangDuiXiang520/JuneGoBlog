@@ -14,6 +14,20 @@ func FriendShipListCheck(ctx *gin.Context, req message.BaseReqInter) (message.Ba
 	return http.StatusOK, nil
 }
 
+func FriendShipUnShowListCheck(ctx *gin.Context, req message.BaseReqInter) (message.BaseRespInter, error) {
+	reqU := req.(*message.FriendUnShowListReq)
+	hopeStatus := [2]int{consts.FriendShipApproving, consts.FriendShipApprovalFail}
+	if reqU.Status != 0 {
+		for _, hs := range hopeStatus {
+			if reqU.Status == hs {
+				return nil, nil
+			}
+		}
+		return consts.ParamErrorRespHeader, errors.New("")
+	}
+	return nil, nil
+}
+
 func FriendApprovalCheck(ctx *gin.Context, req message.BaseReqInter) (message.BaseRespInter, error) {
 	reqA := req.(*message.FriendApprovalReq)
 

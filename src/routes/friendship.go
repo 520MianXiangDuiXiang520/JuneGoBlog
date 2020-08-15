@@ -20,6 +20,8 @@ func FriendShipRoutes(rg *gin.RouterGroup) {
 func friendshipUnShowRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		middleware.Permiter(&middleware.AdminPermit{}),
+		utils.EasyHandler(check.FriendShipUnShowListCheck,
+			server.FriendUnShowListLogic, &message.FriendUnShowListReq{}),
 	}
 }
 

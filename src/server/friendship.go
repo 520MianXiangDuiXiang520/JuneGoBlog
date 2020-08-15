@@ -19,6 +19,7 @@ func FriendApprovalLogic(ctx *gin.Context, req message.BaseReqInter) message.Bas
 	return resp
 }
 
+// 获取友链列表（展示）
 func FriendShipListLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
 	resp := message.FriendShipListResp{}
 
@@ -27,6 +28,29 @@ func FriendShipListLogic(ctx *gin.Context, req message.BaseReqInter) message.Bas
 	if err := dao.QueryAllFriendLinkByStatus(consts.FriendShipApprovalPass, &friendshipList); err != nil {
 		log.Printf("FriendShipListLogic dao.DB.Find ERROR [%v]\n", err)
 		return consts.SystemErrorRespHeader
+	}
+	resp.Header = consts.SuccessRespHeader
+	resp.FriendShipList = friendshipList
+	resp.Total = len(friendshipList)
+	return resp
+}
+
+// 获取不展示的友链列表
+func FriendUnShowListLogic(ctx *gin.Context, re message.BaseReqInter) message.BaseRespInter {
+	resp := message.FriendUnShowListResp{}
+	reqU := re.(*message.FriendUnShowListReq)
+	friendshipList := make([]dao.FriendShipLink, 0)
+	if reqU.Status == 0 {
+		hopeStatus := [2]int{consts.FriendShipApproving, consts.FriendShipApprovalFail}
+		if err := dao.QueryAllFriendLinkINStatus(hopeStatus[:], &friendshipList); err != nil {
+			log.Printf("FriendUnShowListLogic dao.DB.Find ERROR [%v]\n", err)
+			return consts.SystemErrorRespHeader
+		}
+	} else {
+		if err := dao.QueryAllFriendLinkByStatus(reqU.Status, &friendshipList); err != nil {
+			log.Printf("FriendUnShowListLogic dao.DB.Find ERROR [%v]\n", err)
+			return consts.SystemErrorRespHeader
+		}
 	}
 	resp.Header = consts.SuccessRespHeader
 	resp.FriendShipList = friendshipList

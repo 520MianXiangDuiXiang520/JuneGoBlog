@@ -14,6 +14,11 @@ func QueryAllFriendLinkByStatus(status int, fl *[]FriendShipLink) error {
 	return DB.Where("status = ?", status).Find(&fl).Error
 }
 
+// 查询所有状态 in (status) 的友链
+func QueryAllFriendLinkINStatus(status []int, fl *[]FriendShipLink) error {
+	return DB.Where("status IN (?)", status).Find(&fl).Error
+}
+
 // 根据 FID 判断某条友链是否存在
 func HasFriendLinkByID(fid int) (*FriendShipLink, bool) {
 	fl := new(FriendShipLink)
