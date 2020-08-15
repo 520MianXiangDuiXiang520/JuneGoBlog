@@ -9,28 +9,27 @@ import (
 func TestFriendAddCheck(t *testing.T) {
 	c := new(gin.Context)
 
-	if _, err := FriendAddCheck(c, &message.FriendAddReq{}); err == nil {
+	if _, err := FriendApplicationCheck(c, &message.FriendApplicationReq{}); err == nil {
 		t.Error("Check FILE")
 	}
 
-	if _, err := FriendAddCheck(c, &message.FriendAddReq{
+	if _, err := FriendApplicationCheck(c, &message.FriendApplicationReq{
 		SiteName: "xxx",
 	}); err == nil {
 		t.Error("Check FILE")
 	}
 
-	if _, err := FriendAddCheck(c, &message.FriendAddReq{
+	if _, err := FriendApplicationCheck(c, &message.FriendApplicationReq{
 		SiteLink: "xxx",
 	}); err == nil {
 		t.Error("Check FILE")
 	}
 
-	if _, err := FriendAddCheck(c, &message.FriendAddReq{
+	if _, err := FriendApplicationCheck(c, &message.FriendApplicationReq{
 		SiteLink: "xxx",
 		SiteName: "xxx",
 	}); err != nil {
 		t.Error("Check FILE")
 	}
-
 
 }

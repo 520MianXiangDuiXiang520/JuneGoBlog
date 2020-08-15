@@ -8,12 +8,23 @@ import (
 	"log"
 )
 
-func FriendShipListLogic(ctx *gin.Context, req interface{}) interface{} {
+func FriendApprovalLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
+	reqA := req.(*message.FriendApprovalReq)
+	resp := message.FriendApprovalResp{}
+	if err := dao.UpdateFriendStatusByID(reqA.FriendshipID, reqA.Result); err != nil {
+		log.Printf("update friendship statue error! fid = [%v]", reqA.FriendshipID)
+		return consts.SystemErrorRespHeader
+	}
+	resp.Header = consts.SuccessRespHeader
+	return resp
+}
+
+func FriendShipListLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
 	resp := message.FriendShipListResp{}
 
 	// 从数据库中读取所有的 friendShip Link 信息
 	friendshipList := make([]dao.FriendShipLink, 0)
-	if err := dao.QueryAllFriendLink(&friendshipList); err != nil {
+	if err := dao.QueryAllFriendLinkByStatus(consts.FriendShipApprovalPass, &friendshipList); err != nil {
 		log.Printf("FriendShipListLogic dao.DB.Find ERROR [%v]\n", err)
 		return consts.SystemErrorRespHeader
 	}
@@ -23,20 +34,21 @@ func FriendShipListLogic(ctx *gin.Context, req interface{}) interface{} {
 	return resp
 }
 
-// 添加友链
-func FriendAddLogic(ctx *gin.Context, re interface{}) interface{} {
-	req := re.(*message.FriendAddReq)
-	resp := message.FriendAddResp{}
+// 申请添加友链
+func FriendApplicationLogic(ctx *gin.Context, re message.BaseReqInter) message.BaseRespInter {
+	req := re.(*message.FriendApplicationReq)
+	resp := message.FriendApplicationResp{}
 
 	err := dao.AddFriendship(&dao.FriendShipLink{
 		SiteName: req.SiteName,
 		SiteLink: req.SiteLink,
 		ImgLink:  req.ImgLink,
 		Intro:    req.Intro,
+		Status:   consts.FriendShipApproving,
 	})
 
 	if err != nil {
-		log.Printf("FriendAddLogic CALL AddFriendship Error !!!")
+		log.Printf("FriendApplicationLogic CALL AddFriendship Error !!!")
 		return consts.SystemErrorRespHeader
 	}
 
@@ -46,9 +58,9 @@ func FriendAddLogic(ctx *gin.Context, re interface{}) interface{} {
 
 // 删除友链
 
-func FriendDeleteLogic(ctx *gin.Context, req interface{}) interface{} {
+func FriendDeleteLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
 	reqD := req.(*message.FriendDeleteReq)
-	var resp  message.FriendAddResp
+	var resp message.FriendApplicationResp
 	if err := dao.DeleteFriendshipByID(reqD.ID); err != nil {
 		if err == dao.NoRecordError {
 			return consts.ParamErrorRespHeader

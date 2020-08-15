@@ -3,7 +3,6 @@ package dao
 import (
 	"bufio"
 	"io"
-	"log"
 	"os"
 	"path"
 	"reflect"
@@ -35,7 +34,6 @@ func Load(iniPath, block string, s interface{}) {
 	// 1. 读取ini文件
 	_, currentfile, _, _ := runtime.Caller(1) // 忽略错误
 	filename := path.Join(path.Dir(currentfile), iniPath)
-	log.Println("ini Tool read [" + filename + "]")
 	lines := ReadLines(filename)
 	t := reflect.TypeOf(s)
 	v := reflect.ValueOf(s)

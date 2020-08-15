@@ -8,10 +8,10 @@ import (
 	"log"
 )
 
-func TagListLogin(ctx *gin.Context, req interface{}) interface{} {
+func TagListLogin(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
 	var resp message.TagListResp
 	tags := make([]dao.Tag, 0)
-	if err:= dao.QueryAllTagsOrderByTime(&tags); err != nil {
+	if err := dao.QueryAllTagsOrderByTime(&tags); err != nil {
 		log.Printf("QueryAllTagsOrderByTime Error!!!")
 		return consts.SystemErrorRespHeader
 	}
@@ -20,7 +20,7 @@ func TagListLogin(ctx *gin.Context, req interface{}) interface{} {
 		tagInfos = append(tagInfos, message.TagInfo{
 			// TODO: 从 article 表中查
 			ArticleTotal: 10,
-			Tag: tag,
+			Tag:          tag,
 		})
 	}
 	resp.Tags = tagInfos
@@ -29,7 +29,7 @@ func TagListLogin(ctx *gin.Context, req interface{}) interface{} {
 	return resp
 }
 
-func TagAddLogin(ctx *gin.Context, req interface{}) interface{} {
+func TagAddLogin(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
 	reqA := req.(*message.TagAddReq)
 	var resp message.TagAddResp
 	if err := dao.AddTag(reqA.TagName); err != nil {

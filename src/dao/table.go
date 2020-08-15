@@ -4,11 +4,12 @@ import "time"
 
 // 友链信息
 type FriendShipLink struct {
-	ID int                `json:"id" gorm:"column:id"`
-	SiteName string       `json:"siteName" gorm:"column:siteName"`       // 网站名
-	SiteLink string       `json:"link" gorm:"column:siteLink"`           // 链接
-	ImgLink string        `json:"imgLink" gorm:"column:imgLink"`         // 网站图标链接
-	Intro string          `json:"intro" gorm:"column:intro"`             // 简介
+	ID       int    `json:"id" gorm:"column:id"`
+	SiteName string `json:"siteName" gorm:"column:siteName"` // 网站名
+	SiteLink string `json:"link" gorm:"column:siteLink"`     // 链接
+	ImgLink  string `json:"imgLink" gorm:"column:imgLink"`   // 网站图标链接
+	Intro    string `json:"intro" gorm:"column:intro"`       // 简介
+	Status   int    `json:"status" gorm:"column:status"`     // 状态
 }
 
 func (FriendShipLink) TableName() string {
@@ -17,9 +18,9 @@ func (FriendShipLink) TableName() string {
 
 // 文章标签
 type Tag struct {
-	ID int                `json:"id" gorm:"column:id"`
-	Name string           `json:"name" gorm:"column:name"`
-	CreateTime time.Time  `json:"create_time" gorm:"column:create_time"`
+	ID         int       `json:"id" gorm:"column:id"`
+	Name       string    `json:"name" gorm:"column:name"`
+	CreateTime time.Time `json:"create_time" gorm:"column:create_time"`
 }
 
 func (Tag) TableName() string {

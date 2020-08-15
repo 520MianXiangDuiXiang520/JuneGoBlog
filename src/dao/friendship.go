@@ -1,7 +1,6 @@
 package dao
 
 import (
-
 	"log"
 )
 
@@ -10,11 +9,44 @@ func QueryAllFriendLink(fl *[]FriendShipLink) error {
 	return DB.Find(&fl).Error
 }
 
+// 查询所有状态为 status 的友链
+func QueryAllFriendLinkByStatus(status int, fl *[]FriendShipLink) error {
+	return DB.Where("status = ?", status).Find(&fl).Error
+}
+
+// 根据 FID 判断某条友链是否存在
+func HasFriendLinkByID(fid int) (*FriendShipLink, bool) {
+	fl := new(FriendShipLink)
+	DB.Where("id = ?", fid).Find(&fl)
+	if fl.Status == 0 && fl.ID == 0 {
+		return nil, false
+	} else {
+		return fl, true
+	}
+}
+
+func UpdateFriendStatusByID(fid, status int) error {
+	tx := DB.Begin()
+	if err := tx.Error; err != nil {
+		log.Printf("UpdateFriendStatusByID Begin Error, fid = [%v], : [%v]\n", fid, err)
+		return err
+	}
+	var err error
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			log.Printf("UpdateFriendStatusByID Error, Callbacked... fid = [%v]; [%v]", fid, err)
+		}
+		tx.Commit()
+	}()
+	return tx.Model(&FriendShipLink{ID: fid}).Update("status", status).Error
+}
+
 // 添加一条友链
 func AddFriendship(fs *FriendShipLink) error {
 	tx := DB.Begin()
-	if err := tx.Error; err != nil{
-		log.Printf("AddFriendship Begin Error, FriendShipLink.Name = [%v], : [%v]\n",fs.SiteName, err)
+	if err := tx.Error; err != nil {
+		log.Printf("AddFriendship Begin Error, FriendShipLink.Name = [%v], : [%v]\n", fs.SiteName, err)
 		return err
 	}
 	var err error
