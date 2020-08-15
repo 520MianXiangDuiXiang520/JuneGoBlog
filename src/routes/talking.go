@@ -1,10 +1,10 @@
 package routes
 
 import (
-	//"JuneGoBlog/src/utils"
+	//"JuneGoBlog/src/junebao.top"
 	"github.com/gin-gonic/gin"
 )
 
 func TalkingRegister(rg *gin.RouterGroup) {
-	//rg.POST("/list", utils.EasyHandler(&utils.LogicContext{CheckFunc: CheckList, LogicFunc: ListLogic}))
+	//rg.POST("/list", junebao.top.EasyHandler(&junebao.top.LogicContext{CheckFunc: CheckList, LogicFunc: ListLogic}))
 }

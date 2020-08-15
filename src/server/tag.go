@@ -1,19 +1,19 @@
 package server
 
 import (
-	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
+	"JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
-func TagListLogin(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
+func TagListLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	var resp message.TagListResp
 	tags := make([]dao.Tag, 0)
 	if err := dao.QueryAllTagsOrderByTime(&tags); err != nil {
 		log.Printf("QueryAllTagsOrderByTime Error!!!")
-		return consts.SystemErrorRespHeader
+		return junebao_top.SystemErrorRespHeader
 	}
 	tagInfos := make([]message.TagInfo, 0)
 	for _, tag := range tags {
@@ -25,17 +25,17 @@ func TagListLogin(ctx *gin.Context, req message.BaseReqInter) message.BaseRespIn
 	}
 	resp.Tags = tagInfos
 	resp.Total = len(tagInfos)
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	return resp
 }
 
-func TagAddLogin(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
+func TagAddLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	reqA := req.(*message.TagAddReq)
 	var resp message.TagAddResp
 	if err := dao.AddTag(reqA.TagName); err != nil {
 		log.Printf("Add Tag Error, name = [%s]\n", reqA.TagName)
-		return consts.SystemErrorRespHeader
+		return junebao_top.SystemErrorRespHeader
 	}
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	return resp
 }

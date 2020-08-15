@@ -1,22 +1,21 @@
-package utils
+package junebao_top
 
 import (
-	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/message"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 )
 
-type CheckFunc func(ctx *gin.Context, req message.BaseReqInter) (message.BaseRespInter, error)
-type LogicFunc func(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter
+type CheckFunc func(ctx *gin.Context, req BaseReqInter) (BaseRespInter, error)
+type LogicFunc func(ctx *gin.Context, req BaseReqInter) BaseRespInter
 
-func EasyHandler(cf CheckFunc, lf LogicFunc, req message.BaseReqInter) gin.HandlerFunc {
+// 解析请求，整合检查请求参数，响应逻辑，并响应
+func EasyHandler(cf CheckFunc, lf LogicFunc, req BaseReqInter) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var resp interface{}
 		if err := req.JSON(context, &req); err != nil {
 			log.Printf("EasyHandler: BindJSON ERROR!!!")
-			resp = consts.ParamErrorRespHeader
+			resp = ParamErrorRespHeader
 		} else {
 			if checkResp, err := cf(context, req); err != nil {
 				resp = checkResp

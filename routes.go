@@ -1,18 +1,18 @@
 package main
 
 import (
+	"JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/routes"
-	"JuneGoBlog/src/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func Register(c *gin.Engine) {
 	c.Use(middleware.ApiView())
-	utils.HandlerRoute(c, "api/article", routes.ArticleRegister)
-	utils.HandlerRoute(c, "api/tag", routes.TagRegister)
-	utils.HandlerRoute(c, "api/talking", routes.TalkingRegister)
-	utils.HandlerRoute(c, "api/admin", routes.AdminRegister)
-	utils.HandlerRoute(c, "api/friendship", routes.FriendShipRoutes)
+	junebao_top.URLPatterns(c, "api/article", routes.ArticleRegister)
+	junebao_top.URLPatterns(c, "api/tag", routes.TagRegister)
+	junebao_top.URLPatterns(c, "api/talking", routes.TalkingRegister)
+	junebao_top.URLPatterns(c, "api/admin", routes.AdminRegister)
+	junebao_top.URLPatterns(c, "api/friendship", routes.FriendShipRoutes)
 
 }

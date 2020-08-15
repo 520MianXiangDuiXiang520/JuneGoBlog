@@ -3,40 +3,42 @@ package server
 import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
+	"JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
-func FriendApprovalLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
+// 友链审批
+func FriendApprovalLogic(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	reqA := req.(*message.FriendApprovalReq)
 	resp := message.FriendApprovalResp{}
 	if err := dao.UpdateFriendStatusByID(reqA.FriendshipID, reqA.Result); err != nil {
 		log.Printf("update friendship statue error! fid = [%v]", reqA.FriendshipID)
-		return consts.SystemErrorRespHeader
+		return junebao_top.SystemErrorRespHeader
 	}
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	return resp
 }
 
 // 获取友链列表（展示）
-func FriendShipListLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
+func FriendShipListLogic(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	resp := message.FriendShipListResp{}
 
 	// 从数据库中读取所有的 friendShip Link 信息
 	friendshipList := make([]dao.FriendShipLink, 0)
 	if err := dao.QueryAllFriendLinkByStatus(consts.FriendShipApprovalPass, &friendshipList); err != nil {
 		log.Printf("FriendShipListLogic dao.DB.Find ERROR [%v]\n", err)
-		return consts.SystemErrorRespHeader
+		return junebao_top.SystemErrorRespHeader
 	}
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	resp.FriendShipList = friendshipList
 	resp.Total = len(friendshipList)
 	return resp
 }
 
 // 获取不展示的友链列表
-func FriendUnShowListLogic(ctx *gin.Context, re message.BaseReqInter) message.BaseRespInter {
+func FriendUnShowListLogic(ctx *gin.Context, re junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	resp := message.FriendUnShowListResp{}
 	reqU := re.(*message.FriendUnShowListReq)
 	friendshipList := make([]dao.FriendShipLink, 0)
@@ -44,22 +46,22 @@ func FriendUnShowListLogic(ctx *gin.Context, re message.BaseReqInter) message.Ba
 		hopeStatus := [2]int{consts.FriendShipApproving, consts.FriendShipApprovalFail}
 		if err := dao.QueryAllFriendLinkINStatus(hopeStatus[:], &friendshipList); err != nil {
 			log.Printf("FriendUnShowListLogic dao.DB.Find ERROR [%v]\n", err)
-			return consts.SystemErrorRespHeader
+			return junebao_top.SystemErrorRespHeader
 		}
 	} else {
 		if err := dao.QueryAllFriendLinkByStatus(reqU.Status, &friendshipList); err != nil {
 			log.Printf("FriendUnShowListLogic dao.DB.Find ERROR [%v]\n", err)
-			return consts.SystemErrorRespHeader
+			return junebao_top.SystemErrorRespHeader
 		}
 	}
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	resp.FriendShipList = friendshipList
 	resp.Total = len(friendshipList)
 	return resp
 }
 
 // 申请添加友链
-func FriendApplicationLogic(ctx *gin.Context, re message.BaseReqInter) message.BaseRespInter {
+func FriendApplicationLogic(ctx *gin.Context, re junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	req := re.(*message.FriendApplicationReq)
 	resp := message.FriendApplicationResp{}
 
@@ -73,25 +75,24 @@ func FriendApplicationLogic(ctx *gin.Context, re message.BaseReqInter) message.B
 
 	if err != nil {
 		log.Printf("FriendApplicationLogic CALL AddFriendship Error !!!")
-		return consts.SystemErrorRespHeader
+		return junebao_top.SystemErrorRespHeader
 	}
 
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	return resp
 }
 
 // 删除友链
-
-func FriendDeleteLogic(ctx *gin.Context, req message.BaseReqInter) message.BaseRespInter {
+func FriendDeleteLogic(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
 	reqD := req.(*message.FriendDeleteReq)
 	var resp message.FriendApplicationResp
 	if err := dao.DeleteFriendshipByID(reqD.ID); err != nil {
 		if err == dao.NoRecordError {
-			return consts.ParamErrorRespHeader
+			return junebao_top.ParamErrorRespHeader
 		}
 		log.Printf("DELETE Friendship ERROR ! id = [%d]", reqD.ID)
-		return consts.SystemErrorRespHeader
+		return junebao_top.SystemErrorRespHeader
 	}
-	resp.Header = consts.SuccessRespHeader
+	resp.Header = junebao_top.SuccessRespHeader
 	return resp
 }
