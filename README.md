@@ -1,7 +1,7 @@
 # JuneGoBlog
 
 
-<p >
+<p align="center">
 <a href="https://travis-ci.org/">
   <img src="https://travis-ci.com/520MianXiangDuiXiang520/JuneGoBlog.svg?token=7mqBvrpUUzHXp1nyitHA&branch=master">
 </a>
