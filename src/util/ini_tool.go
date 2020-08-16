@@ -3,9 +3,11 @@ package util
 import (
 	"bufio"
 	"io"
+	"log"
 	"os"
 	"path"
 	"reflect"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -22,10 +24,14 @@ func ReadLines(filePath string) []string {
 	rd := bufio.NewReader(f)
 	for {
 		line, err := rd.ReadString('\n') //以'\n'为结束符读入一行
-		if err != nil || io.EOF == err {
-			break
+		if err != nil && err != io.EOF {
+			log.Println(err)
+			panic("Read Error!!")
 		}
 		result = append(result, line)
+		if err == io.EOF {
+			break
+		}
 	}
 	return result
 }
@@ -37,19 +43,29 @@ func Load(iniPath, block string, s interface{}) {
 	lines := ReadLines(filename)
 	t := reflect.TypeOf(s)
 	v := reflect.ValueOf(s)
-	//v.Elem().Field(0).SetString("ssss")
 	offset := 0
 	for i, line := range lines {
-		if line != "["+block+"]" {
+		pat := "(\\[" + block + "\\]).*"
+		patt, _ := regexp.Compile(pat)
+		ok := patt.MatchString(line)
+		if !ok {
 			continue
 		}
 		offset = i
 	}
 	lines = lines[offset:]
 	for _, line := range lines {
-
-		if len(line) <= 0 || string(line[0]) == "[" {
+		if len(line) <= 0 {
 			continue
+		}
+		pat := "(\\[" + block + "\\]).*"
+		patt, _ := regexp.Compile(pat)
+		ok := patt.MatchString(line)
+		if string(line[0]) == "[" && ok {
+			continue
+		}
+		if string(line[0]) == "[" && !ok {
+			break
 		}
 		line = strings.Trim(line, "\n")
 		line = strings.Trim(line, "\r")
