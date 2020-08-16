@@ -76,13 +76,5 @@ func DeleteFriendshipByID(fid int) error {
 		}
 		tx.Commit()
 	}()
-
-	deleteFri := tx.Model(&FriendShipLink{}).Where("id = ?", fid)
-	var count int
-	deleteFri.Count(&count)
-	if count <= 0 {
-		log.Printf("No This Friendship")
-		return NoRecordError
-	}
 	return tx.Where("id = ?", fid).Delete(&FriendShipLink{}).Error
 }

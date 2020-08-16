@@ -1,9 +1,5 @@
 package dao
 
-import "errors"
-
-var (
-	NoRecordError = errors.New("NoRecordError")
-)
-
-
+//var (
+//	NoRecordError = errors.New("NoRecordError")
+//)

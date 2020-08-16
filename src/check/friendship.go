@@ -60,7 +60,8 @@ func FriendApplicationCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (jun
 
 func FriendDeleteCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
 	reqD := req.(*message.FriendDeleteReq)
-	if reqD.ID <= 0 {
+
+	if _, ok := dao.HasFriendLinkByID(reqD.ID); !ok {
 		return junebao_top.ParamErrorRespHeader, errors.New("请求参数错误")
 	}
 	return nil, nil

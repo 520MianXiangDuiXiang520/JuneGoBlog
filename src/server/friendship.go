@@ -87,10 +87,6 @@ func FriendDeleteLogic(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_t
 	reqD := req.(*message.FriendDeleteReq)
 	var resp message.FriendApplicationResp
 	if err := dao.DeleteFriendshipByID(reqD.ID); err != nil {
-		if err == dao.NoRecordError {
-			return junebao_top.ParamErrorRespHeader
-		}
-		log.Printf("DELETE Friendship ERROR ! id = [%d]", reqD.ID)
 		return junebao_top.SystemErrorRespHeader
 	}
 	resp.Header = junebao_top.SuccessRespHeader
