@@ -57,3 +57,13 @@ type Article struct {
 func (Article) TableName() string {
 	return "articles"
 }
+
+type ArticleTags struct {
+	ID        int `json:"id"gorm:"column:id"`
+	ArticleID int `json:"articleID"gorm:"column:article_id"`
+	TagID     int `json:"tagID"gorm:"column:tag_id"`
+}
+
+func (ArticleTags) TableName() string {
+	return "article_tags"
+}

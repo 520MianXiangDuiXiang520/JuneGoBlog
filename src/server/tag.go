@@ -20,7 +20,8 @@ func TagListLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.Ba
 		tagInfos = append(tagInfos, message.TagInfo{
 			// TODO: 从 article 表中查
 			ArticleTotal: 10,
-			Tag:          tag,
+			Name:         tag.Name,
+			CreateTime:   tag.CreateTime.Unix(),
 		})
 	}
 	resp.Tags = tagInfos

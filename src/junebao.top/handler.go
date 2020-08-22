@@ -23,6 +23,7 @@ func EasyHandler(cf CheckFunc, lf LogicFunc, req BaseReqInter) gin.HandlerFunc {
 				resp = lf(context, req)
 			}
 		}
+		context.Set("resp", resp)
 		context.JSON(http.StatusOK, resp)
 	}
 }

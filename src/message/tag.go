@@ -1,7 +1,6 @@
 package message
 
 import (
-	"JuneGoBlog/src/dao"
 	"JuneGoBlog/src/junebao.top"
 	"github.com/gin-gonic/gin"
 )
@@ -15,8 +14,10 @@ func (tlq TagListReq) JSON(ctx *gin.Context, jsonReq *junebao_top.BaseReqInter) 
 
 // 标签信息
 type TagInfo struct {
-	dao.Tag
-	ArticleTotal int `json:"article_total"` // 文章数
+	ID           int    `json:"id" gorm:"column:id"`
+	Name         string `json:"name" gorm:"column:name"`
+	CreateTime   int64  `json:"create_time" gorm:"column:create_time"`
+	ArticleTotal int    `json:"article_total"` // 文章数
 }
 
 // api/tag/list 响应格式
