@@ -13,7 +13,7 @@ before_script:
   - echo "ip=$MySQL_IP" >> secret.ini
   - echo "port=$MySQL_PORT" >> secret.ini
   - echo "dbname=$MySQL_DBNAME" >> secret.ini
-  - echo "[redis] >> secret.ini
+  - echo "[redis]" >> secret.ini
   - echo "host=$Redis_Host" >> secret.ini
   - echo "port=$Redis_Port" >> secret.ini
   - echo "password=$Redis_Password" >> secret.ini
