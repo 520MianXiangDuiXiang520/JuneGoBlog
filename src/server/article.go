@@ -49,9 +49,14 @@ func ArticleListLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.
 		})
 	}
 
+	total, err := dao.QueryArticleTotal()
+	if err != nil {
+		log.Printf("获取文章总数失败！")
+		return junebaotop.SystemErrorRespHeader
+	}
 	resp.Header = junebaotop.SuccessRespHeader
 	resp.ArticleList = articleTagsList
-	resp.Total = len(articleList)
+	resp.Total = total
 	return resp
 }
 

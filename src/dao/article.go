@@ -38,6 +38,11 @@ func queryArticleIDListFromCache(page, pageSize int) ([]int, error) {
 	r := make([]int, 0)
 	rc := RedisPool.Get()
 	defer rc.Close()
+	total, err := QueryArticleTotal()
+	if err != nil {
+		return nil, err
+	}
+	pageSize = total - start + 1
 	for i := 0; i < pageSize; i++ {
 		//log.Printf("Do Redis: LINDEX %v %v", consts.ArticleIDListCache, i + start - 1)
 		if err := rc.Send("lIndex", consts.ArticleIDListCache, i+start-1); err != nil {
@@ -215,4 +220,30 @@ func QueryArticleDetail(id int) (Article, error) {
 	a := Article{}
 	r := DB.Where("id = ?", id).First(&a)
 	return a, r.Error
+}
+
+func queryArticleTotalByCache() (int, error) {
+	rc := RedisPool.Get()
+	defer rc.Close()
+	return redis.Int(rc.Do("LLen", consts.ArticleIDListCache))
+}
+
+func queryArticleTotalByDB() (int, error) {
+	var total int
+	c := DB.Model(&Article{}).Count(&total)
+	return total, c.Error
+}
+
+func QueryArticleTotal() (int, error) {
+	var total int
+	var err error
+	if src.Setting.Redis {
+		total, err = queryArticleTotalByCache()
+		if err != nil {
+			log.Printf("通过缓存获取文章总数失败！！！: %v", err)
+			return queryArticleTotalByDB()
+		}
+		return total, nil
+	}
+	return queryArticleTotalByDB()
 }
