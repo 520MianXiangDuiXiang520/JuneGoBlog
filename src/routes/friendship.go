@@ -11,11 +11,11 @@ import (
 )
 
 func FriendShipRoutes(rg *gin.RouterGroup) {
-	rg.POST("list/", friendListRoutes()...)
-	rg.POST("unshow/", friendshipUnShowRoutes()...)       // 申请中的友链
-	rg.POST("application/", friendApplicationRoutes()...) // 申请
-	rg.POST("delete/", friendDeleteRoutes()...)           // 需要管理员权限
-	rg.POST("approval/", friendApprovalRoutes()...)       // 审批，需要管理员权限
+	rg.POST("/list", friendListRoutes()...)
+	rg.POST("/unshow", friendshipUnShowRoutes()...)       // 申请中的友链
+	rg.POST("/application", friendApplicationRoutes()...) // 申请
+	rg.POST("/delete", friendDeleteRoutes()...)           // 需要管理员权限
+	rg.POST("/approval", friendApprovalRoutes()...)       // 审批，需要管理员权限
 }
 
 func friendshipUnShowRoutes() []gin.HandlerFunc {

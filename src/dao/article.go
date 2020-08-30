@@ -42,9 +42,11 @@ func queryArticleIDListFromCache(page, pageSize int) ([]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	pageSize = total - start + 1
+	newPageSize := total - start + 1
+	if newPageSize < pageSize {
+		pageSize = newPageSize
+	}
 	for i := 0; i < pageSize; i++ {
-		//log.Printf("Do Redis: LINDEX %v %v", consts.ArticleIDListCache, i + start - 1)
 		if err := rc.Send("lIndex", consts.ArticleIDListCache, i+start-1); err != nil {
 			log.Fatal("Send Lindex ERROR!")
 			return r, err
@@ -188,9 +190,11 @@ func QueryArticleByLimit(page, pageSize int) ([]Article, error) {
 		if err != nil {
 			log.Printf("从缓存中获取文章ID列表失败")
 			return nil, err
+		} else {
+			log.Printf("ids := %v ", ids)
+			res, err := getArticleInfoListFromCache(ids)
+			return res, err
 		}
-		res, err := getArticleInfoListFromCache(ids)
-		return res, err
 	}
 	articleList := make([]Article, 0)
 	al := DB.Limit(pageSize).Offset(page * pageSize).Find(&articleList)
