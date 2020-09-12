@@ -9,8 +9,16 @@ import (
 )
 
 func ArticleRegister(rg *gin.RouterGroup) {
-	rg.POST("/list", ArticleListRoutes()...)
+	rg.POST("/list", articleListRoutes()...)
 	rg.POST("/detail", articleDetailRoutes()...)
+	rg.POST("/tags", articleTagsRoutes()...)
+}
+
+func articleTagsRoutes() []gin.HandlerFunc {
+	return []gin.HandlerFunc{
+		junebao_top.EasyHandler(check.ArticleTagsCheck,
+			server.ArticleTagsLogic, &message.ArticleTagsReq{}),
+	}
 }
 
 func articleDetailRoutes() []gin.HandlerFunc {
@@ -20,7 +28,7 @@ func articleDetailRoutes() []gin.HandlerFunc {
 	}
 }
 
-func ArticleListRoutes() []gin.HandlerFunc {
+func articleListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.ArticleListCheck,
 			server.ArticleListLogic, &message.ArticleListReq{}),

@@ -1,22 +1,24 @@
 package message
 
 import (
+	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
 	"github.com/gin-gonic/gin"
 )
 
-type ArticleTagInfo struct {
-	ID         int    `json:"id"`
-	Title      string `json:"title"`
-	Abstract   string `json:"abstract"`
-	AuthorID   int    `json:"authorID"`
-	CreateTime int64  `json:"createTime"`
-	Tags       []TagInfo
+type ArticleTagsResp struct {
+	Header junebaotop.BaseRespHeader `json:"header"` // 响应头
+	ID     int                       `json:"id"`
+	Tags   []TagInfo                 `json:"tags"`
+}
+
+type ArticleTagsReq struct {
+	ArticleID int `json:"articleID"form:"articleID"`
 }
 
 type ArticleListResp struct {
 	Header      junebaotop.BaseRespHeader `json:"header"`      // 响应头
-	ArticleList []ArticleTagInfo          `json:"articleList"` // 文章列表
+	ArticleList []dao.Article             `json:"articleList"` // 文章列表
 	Total       int                       `json:"total"`       // 将返回的文章总数
 }
 
@@ -27,23 +29,27 @@ type ArticleListReq struct {
 	Tag      string `json:"tag"form:"tag"`           // 标签
 }
 
+type ArticleDetailReq struct {
+	ArticleID int `json:"articleId"`
+}
+
+type ArticleDetailResp struct {
+	junebaotop.BaseRespHeader
+	dao.Article
+	Text string `json:"text"`
+}
+
+func (atr ArticleTagsReq) JSON(ctx *gin.Context,
+	jsonReq *junebaotop.BaseReqInter) error {
+	return ctx.ShouldBindJSON(&jsonReq)
+}
+
 func (flr ArticleListReq) JSON(ctx *gin.Context,
 	jsonReq *junebaotop.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
 }
 
-// 文章详情页请求
-type ArticleDetailReq struct {
-	ArticleID int `json:"articleId"`
-}
-
 func (adr ArticleDetailReq) JSON(ctx *gin.Context,
 	jsonReq *junebaotop.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
-}
-
-type ArticleDetailResp struct {
-	junebaotop.BaseRespHeader
-	ArticleTagInfo
-	Text string `json:"text"`
 }

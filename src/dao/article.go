@@ -4,6 +4,7 @@ import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/util"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"reflect"
@@ -33,15 +34,11 @@ func QueryArticleIDFromCacheByIndex(index int) (int, error) {
 * Author: JuneBao
 * Time: 2020/8/22 0:45
 **/
-func queryArticleIDListFromCache(page, pageSize int) ([]int, error) {
+func queryArticleIDListFromCache(page, pageSize, total int) ([]int, error) {
 	start := (page-1)*pageSize + 1
 	r := make([]int, 0)
 	rc := RedisPool.Get()
 	defer rc.Close()
-	total, err := QueryArticleTotal()
-	if err != nil {
-		return nil, err
-	}
 	newPageSize := total - start + 1
 	if newPageSize < pageSize {
 		pageSize = newPageSize
@@ -119,28 +116,7 @@ func articleInfoMissHitsUpdate(id int) (Article, error) {
 }
 
 /**
-* WiKi: 从缓存中获取文章信息列表
-* Input: 要查询的文章列表
-* Author: JuneBao
-* Time: 2020/8/22 2:05
-**/
-func getArticleInfoListFromCache(ids []int) ([]Article, error) {
-	result := make([]Article, 0)
-	var err error
-	for _, id := range ids {
-		a, e := queryArticleInfoFromCache(id)
-		if e != nil {
-			log.Printf("getArticleInfoListFromCache Call queryArticleInfoFromCache Error")
-			return result, err
-		}
-		result = append(result, a)
-
-	}
-	return result, nil
-}
-
-/**
-* WiKi: 从缓存中查询单个文章的信息
+* WiKi: 从缓存中查询单个文章的信息,没有查询到会从数据库中补充
 * Author: JuneBao
 * Time: 2020/8/22 16:14
 **/
@@ -151,9 +127,12 @@ func queryArticleInfoFromCache(id int) (Article, error) {
 	defer rc.Close()
 	for _, field := range fields {
 		err := rc.Send("Hget", consts.ArticleInfoHashCache+strconv.Itoa(id), field)
-		util.CatchException(err)
+		if err != nil {
+			mes := fmt.Sprintf("query article info from cache fail, article id = %v", id)
+			util.ExceptionLog(err, mes)
+		}
 	}
-	util.CatchException(rc.Flush())
+	util.ExceptionLog(rc.Flush(), "redis flush fail")
 	for range fields {
 		r, err := rc.Receive()
 		if err != nil {
@@ -168,7 +147,6 @@ func queryArticleInfoFromCache(id int) (Article, error) {
 		}
 		articleFields = append(articleFields, string(r.([]byte)))
 	}
-
 	if len(articleFields) >= len(fields) {
 		authorID, _ := strconv.Atoi(articleFields[3])
 		id, _ := strconv.Atoi(articleFields[2])
@@ -184,16 +162,53 @@ func queryArticleInfoFromCache(id int) (Article, error) {
 
 }
 
-func QueryArticleByLimit(page, pageSize int) ([]Article, error) {
+/**
+* WiKi: 通过缓存查询文章列表页信息
+* Author: JuneBao
+* Time: 2020/9/11 23:27
+**/
+func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]Article, error) {
+	result := make([]Article, 0)
+	st := time.Now().UnixNano() / 1e6
+	// 获取 ArticleID List
+	ids, err := queryArticleIDListFromCache(page, pageSize, total)
+	if err != nil {
+		log.Printf("从缓存中获取文章ID列表失败")
+		// 获取列表失败，开启携程重置数据
+		go func() {
+			iErr := InitArticleIDListCache()
+			if iErr != nil {
+				msg := fmt.Sprintf("Failed to update the article ID in the cache asynchronously")
+				util.ExceptionLog(iErr, msg)
+			}
+		}()
+		return nil, err
+	}
+	log.Printf(" ID List Used: %v ms", time.Now().UnixNano()/1e6-st)
+	for _, id := range ids {
+		var a Article
+		var e error
+		a, e = queryArticleInfoFromCache(id)
+		if e != nil {
+			return nil, e
+		}
+		result = append(result, a)
+		log.Printf("Article Info Used: %v ms", time.Now().UnixNano()/1e6-st)
+	}
+
+	return result, nil
+}
+
+/**
+* WiKi: 查询单页文章列表信息
+* Author: JuneBao
+* Time: 2020/9/11 23:27
+**/
+func QueryArticleInfoByLimit(page, pageSize, total int) ([]Article, error) {
 	if src.Setting.Redis {
-		ids, err := queryArticleIDListFromCache(page, pageSize)
-		if err != nil {
-			log.Printf("从缓存中获取文章ID列表失败")
-			return nil, err
-		} else {
-			log.Printf("ids := %v ", ids)
-			res, err := getArticleInfoListFromCache(ids)
-			return res, err
+		result, err := queryArticleInfoByLimitByCache(page, pageSize, total)
+		if err == nil {
+			return result, err
 		}
 	}
 	articleList := make([]Article, 0)
@@ -211,13 +226,8 @@ func QueryAllArticle(articleList *[]Article) error {
 * Time: 2020/8/22 11:40
 **/
 func QueryArticleInfoByID(id int, article *Article) error {
-	return DB.Where("id = ?", id).First(&article).Error
-}
-
-func HasArticle(id int) bool {
-	a := Article{}
-	DB.Where("id = ?", id).First(&a)
-	return a.ID != 0
+	return DB.Select("id", "title", "abstract",
+		"author_id", "create_time").Where("id = ?", id).First(&article).Error
 }
 
 func QueryArticleDetail(id int) (Article, error) {

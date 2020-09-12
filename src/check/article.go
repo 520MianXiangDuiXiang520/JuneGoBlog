@@ -29,3 +29,11 @@ func ArticleDetailCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaot
 	}
 	return http.StatusOK, nil
 }
+
+func ArticleTagsCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
+	reqL := req.(*message.ArticleTagsReq)
+	if reqL.ArticleID == 0 {
+		return junebaotop.ParamErrorRespHeader, errors.New("ParamError")
+	}
+	return http.StatusOK, nil
+}

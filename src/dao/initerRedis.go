@@ -92,7 +92,7 @@ func InitTagArticleTotal() {
 	_ = QueryAllTagsOrderByTime(&allTags)
 
 	for _, tag := range allTags {
-		total := QueryArticleTotalByTagID(tag.ID)
+		total, _ := QueryArticleTotalByTagID(tag.ID)
 		rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "ID", tag.ID)
 		rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "Name", tag.Name)
 		rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "CreateTime", tag.CreateTime)
