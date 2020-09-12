@@ -5,11 +5,11 @@ import (
 	"runtime"
 )
 
-func CatchException(e error) {
+func ExceptionLog(e error, mes string) {
 	if e != nil {
-		pc, file, line, _ := runtime.Caller(1)
+		pc, _, line, _ := runtime.Caller(1)
 		fName := runtime.FuncForPC(pc).Name()
-		log.Printf("Error: %v(%v): || [%v] 执行异常：%v", file, line, fName, e)
-		panic(e)
+		log.Printf("[Error] %v:%v  %v", fName, line, mes)
+		log.Printf("[Info] %v", e)
 	}
 }

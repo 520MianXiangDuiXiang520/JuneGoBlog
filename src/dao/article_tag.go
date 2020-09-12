@@ -3,7 +3,6 @@ package dao
 import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/util"
 	"log"
 	"strconv"
 )
@@ -36,11 +35,15 @@ func QueryArticleTotalByTagIDFromDB(tagID int) int {
 	return total
 }
 
-func QueryArticleTotalByTagID(tagID int) int {
+func QueryArticleTotalByTagID(tagID int) (int, error) {
+	var err error
+	var result int
 	if src.Setting.Redis {
-		r, e := QueryArticleTotalByTagIDFromCache(tagID)
-		util.CatchException(e)
-		return r
+		result, err = QueryArticleTotalByTagIDFromCache(tagID)
+		if err != nil {
+			return QueryArticleTotalByTagIDFromDB(tagID), err
+		}
+		return result, nil
 	}
-	return QueryArticleTotalByTagIDFromDB(tagID)
+	return QueryArticleTotalByTagIDFromDB(tagID), nil
 }
