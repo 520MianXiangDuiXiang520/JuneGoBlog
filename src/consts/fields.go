@@ -13,3 +13,8 @@ const (
 	FriendShipApprovalPass = 2 // 审批通过
 	FriendShipApprovalFail = 3 // 审批失败
 )
+
+const (
+	MaxUsernameLength = 25 // username 的最大长度
+	MinUsernameLength = 4  // username 的最小长度
+)

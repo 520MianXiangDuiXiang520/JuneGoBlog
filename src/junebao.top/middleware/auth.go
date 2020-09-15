@@ -6,16 +6,6 @@ import (
 	"net/http"
 )
 
-type AuthRequest struct {
-	junebao_top.BaseReqInter
-	User interface{}
-}
-
-func (fau AuthRequest) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
-}
-
 // 检查授权，如果授权通过，返回授权用户，否则第二个参数返回 false
 type AuthFunc func(context *gin.Context) (interface{}, bool)
 

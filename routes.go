@@ -15,5 +15,6 @@ func Register(c *gin.Engine) {
 	junebao_top.URLPatterns(c, "api/talking", routes.TalkingRegister)
 	junebao_top.URLPatterns(c, "api/admin", routes.AdminRegister)
 	junebao_top.URLPatterns(c, "api/friendship", routes.FriendShipRoutes)
+	junebao_top.URLPatterns(c, "api/auth", routes.AuthRegister)
 
 }

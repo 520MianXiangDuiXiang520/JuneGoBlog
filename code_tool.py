@@ -84,6 +84,7 @@ func %server%(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseResp
     def _set_check(self):
         func = """
 func %check%(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+    request := req.(*message.%req%)
     //TODO:...
     return http.StatusOK, nil
 }"""

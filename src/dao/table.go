@@ -42,7 +42,11 @@ type UserToken struct {
 	ID         int       `json:"id" gorm:"column:id"`
 	UserID     int       `json:"userId" gorm:"column:user_id"`
 	Token      string    `json:"token" gorm:"column:token"`
-	CreateTime time.Time `json:"createTime" gorm:"create_time"`
+	ExpireTime time.Time `json:"createTime" gorm:"expire_time"`
+}
+
+func (UserToken) TableName() string {
+	return "user_token"
 }
 
 type Article struct {
