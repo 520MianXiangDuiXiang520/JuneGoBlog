@@ -169,7 +169,6 @@ func queryArticleInfoFromCache(id int) (Article, error) {
 **/
 func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]Article, error) {
 	result := make([]Article, 0)
-	st := time.Now().UnixNano() / 1e6
 	// 获取 ArticleID List
 	ids, err := queryArticleIDListFromCache(page, pageSize, total)
 	if err != nil {
@@ -184,7 +183,6 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]Article, error
 		}()
 		return nil, err
 	}
-	log.Printf(" ID List Used: %v ms", time.Now().UnixNano()/1e6-st)
 	for _, id := range ids {
 		var a Article
 		var e error
@@ -193,7 +191,6 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]Article, error
 			return nil, e
 		}
 		result = append(result, a)
-		log.Printf("Article Info Used: %v ms", time.Now().UnixNano()/1e6-st)
 	}
 
 	return result, nil
@@ -205,14 +202,20 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]Article, error
 * Time: 2020/9/11 23:27
 **/
 func QueryArticleInfoByLimit(page, pageSize, total int) ([]Article, error) {
+
 	if src.Setting.Redis {
 		result, err := queryArticleInfoByLimitByCache(page, pageSize, total)
 		if err == nil {
 			return result, err
 		}
 	}
+	start := (page - 1) * pageSize
+	newPageSize := total - start
+	if newPageSize < pageSize {
+		pageSize = newPageSize
+	}
 	articleList := make([]Article, 0)
-	al := DB.Limit(pageSize).Offset(page * pageSize).Find(&articleList)
+	al := DB.Limit(pageSize).Offset(start).Find(&articleList)
 	return articleList, al.Error
 }
 
