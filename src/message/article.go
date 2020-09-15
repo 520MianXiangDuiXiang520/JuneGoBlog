@@ -18,7 +18,7 @@ type ArticleTagsReq struct {
 
 type ArticleListResp struct {
 	Header      junebaotop.BaseRespHeader `json:"header"`      // 响应头
-	ArticleList []dao.Article             `json:"articleList"` // 文章列表
+	ArticleList []dao.ArticleInfo         `json:"articleList"` // 文章列表
 	Total       int                       `json:"total"`       // 将返回的文章总数
 }
 

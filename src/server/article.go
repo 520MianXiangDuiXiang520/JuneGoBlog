@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
-	"time"
 )
 
 func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
@@ -57,7 +56,6 @@ func ArticleTagsLogic(ctx *gin.Context,
 // 文章列表逻辑
 func ArticleListLogic(ctx *gin.Context,
 	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
-	st := time.Now().UnixNano() / 1e6
 	reqL := req.(*message.ArticleListReq)
 	resp := message.ArticleListResp{}
 	total, err := dao.QueryArticleTotal()
@@ -65,19 +63,31 @@ func ArticleListLogic(ctx *gin.Context,
 		log.Printf("获取文章总数失败！")
 		return junebaotop.SystemErrorRespHeader
 	}
-	log.Printf("Used: %v ms", time.Now().UnixNano()/1e6-st)
 
 	articleList, err := dao.QueryArticleInfoByLimit(reqL.Page, reqL.PageSize, total)
 	if err != nil {
 		log.Printf("QueryArticleInfoByLimit Error !")
 		return junebaotop.SystemErrorRespHeader
 	}
-	log.Printf("Used: %v ms", time.Now().UnixNano()/1e6-st)
-
+	resp.ArticleList = make([]dao.ArticleInfo, 0)
+	for _, article := range articleList {
+		tags := make([]dao.Tag, 0)
+		err := dao.QueryAllTagsByArticleID(article.ID, &tags)
+		if err != nil {
+			msg := fmt.Sprintf("get article tags fail, article id = %v", article.ID)
+			util.ExceptionLog(err, msg)
+		}
+		resp.ArticleList = append(resp.ArticleList, dao.ArticleInfo{
+			Tags:       tags,
+			ID:         article.ID,
+			Title:      article.Title,
+			CreateTime: article.CreateTime,
+			Abstract:   article.Abstract,
+			Author:     "Junebao",
+		})
+	}
 	resp.Header = junebaotop.SuccessRespHeader
-	resp.ArticleList = articleList
 	resp.Total = total
-	log.Printf("Used: %v ms", time.Now().UnixNano()/1e6-st)
 	return resp
 }
 

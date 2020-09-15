@@ -54,6 +54,16 @@ type Article struct {
 	CreateTime time.Time `json:"createTime" gorm:"create_time"`
 }
 
+// 文章信息
+type ArticleInfo struct {
+	ID         int       `json:"id"`
+	Title      string    `json:"title"`
+	Abstract   string    `json:"abstract"`
+	Author     string    `json:"author"`
+	CreateTime time.Time `json:"createTime"`
+	Tags       []Tag     `json:"tags"`
+}
+
 func (Article) TableName() string {
 	return "articles"
 }
