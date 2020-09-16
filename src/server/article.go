@@ -106,3 +106,12 @@ func ArticleDetailLogic(ctx *gin.Context,
 	resp.BaseRespHeader = junebaotop.SuccessRespHeader
 	return resp
 }
+
+func ArticleAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	request := req.(*message.ArticleAddReq)
+	resp := message.ArticleAddResp{}
+	// TODO:...
+	log.Println(request)
+	resp.Header = junebaotop.SuccessRespHeader
+	return resp
+}

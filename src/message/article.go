@@ -53,3 +53,17 @@ func (adr ArticleDetailReq) JSON(ctx *gin.Context,
 	jsonReq *junebaotop.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
 }
+
+type ArticleAddResp struct {
+	Header junebaotop.BaseRespHeader `json:"header"`
+}
+
+type ArticleAddReq struct {
+	dao.Article
+	Tags []dao.Tag `json:"tags"`
+}
+
+func (r ArticleAddReq) JSON(ctx *gin.Context,
+	jsonReq *junebaotop.BaseReqInter) error {
+	return ctx.ShouldBindJSON(&jsonReq)
+}
