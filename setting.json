@@ -1,3 +1,4 @@
 {
-  "redis": false
+  "redis": true,
+  "abstractLen": 200
 }

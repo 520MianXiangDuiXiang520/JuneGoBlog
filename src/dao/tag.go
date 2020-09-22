@@ -41,8 +41,8 @@ func AddTag(name string) error {
 	return err
 }
 
-func QueryTagByID(id int) Tag {
+func QueryTagByID(id int) *Tag {
 	result := Tag{}
 	DB.Where("id = ?", id).First(&result)
-	return result
+	return &result
 }

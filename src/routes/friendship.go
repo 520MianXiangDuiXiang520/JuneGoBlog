@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"JuneGoBlog/src"
 	"JuneGoBlog/src/check"
 	"JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/junebao.top/middleware"
 	"JuneGoBlog/src/message"
+	middleware2 "JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/server"
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +20,8 @@ func FriendShipRoutes(rg *gin.RouterGroup) {
 
 func friendshipUnShowRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Permiter(src.AdminPermit),
+		middleware.Auth(middleware2.TokenAuth),
+		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.FriendShipUnShowListCheck,
 			server.FriendUnShowListLogic, &message.FriendUnShowListReq{}),
 	}
@@ -28,7 +29,8 @@ func friendshipUnShowRoutes() []gin.HandlerFunc {
 
 func friendApprovalRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Permiter(src.AdminPermit),
+		middleware.Auth(middleware2.TokenAuth),
+		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.FriendApprovalCheck,
 			server.FriendApprovalLogic, &message.FriendApprovalReq{}),
 	}
@@ -36,7 +38,8 @@ func friendApprovalRoutes() []gin.HandlerFunc {
 
 func friendDeleteRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Permiter(src.AdminPermit),
+		middleware.Auth(middleware2.TokenAuth),
+		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.FriendDeleteCheck,
 			server.FriendDeleteLogic, &message.FriendDeleteReq{}),
 	}
@@ -44,7 +47,6 @@ func friendDeleteRoutes() []gin.HandlerFunc {
 
 func friendApplicationRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		//middleware.Permiter(&myMiddle.AdminPermit{}),
 		junebao_top.EasyHandler(check.FriendApplicationCheck,
 			server.FriendApplicationLogic, &message.FriendApplicationReq{}),
 	}

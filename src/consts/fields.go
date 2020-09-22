@@ -18,3 +18,12 @@ const (
 	MaxUsernameLength = 25 // username 的最大长度
 	MinUsernameLength = 4  // username 的最小长度
 )
+
+const (
+	AbstractSplitStr = "<!-- more -->"
+)
+
+const (
+	VisitorPermission = 1 // 游客
+	AdminPermission   = 2 // 管理员
+)

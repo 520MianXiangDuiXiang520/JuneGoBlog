@@ -13,7 +13,8 @@ import (
 var Setting setting
 
 type setting struct {
-	Redis bool `json:"redis"` // 是否使用redis
+	AbstractLen int  `json:"abstractLen"` // 默认的摘要长度
+	Redis       bool `json:"redis"`       // 是否使用redis
 }
 
 func readJson(filePath string) (result string) {

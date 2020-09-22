@@ -70,12 +70,12 @@ func %route%() []gin.HandlerFunc {
     def _set_server(self):
         func = """
 func %server%(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
-        request := req.(*message.%req%)
-        resp := message.%resp%{}
-        // TODO:...
-        log.Println(request)
-        resp.Header = junebaotop.SuccessRespHeader
-        return resp
+    request := req.(*message.%req%)
+    resp := message.%resp%{}
+    // TODO:...
+    log.Println(request)
+    resp.Header = junebaotop.SuccessRespHeader
+    return resp
 }"""
         func = f_text(func, self)
         with open(f"./src/server/{self.routes[1]}.go", "a+") as fp:

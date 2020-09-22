@@ -79,8 +79,8 @@ func setNewArticleInfoToCache(id int, article *Article) error {
 	fields := []string{
 		"Title", "Abstract", "ID", "AuthorID", "CreateTime",
 	}
+	immutable := reflect.ValueOf(article).Elem()
 	for _, field := range fields {
-		immutable := reflect.ValueOf(article)
 		val := immutable.FieldByName(field)
 		_, err := rc.Do("HSET", consts.ArticleInfoHashCache+strconv.Itoa(id), field, val)
 		if err != nil {
@@ -229,8 +229,8 @@ func QueryAllArticle(articleList *[]Article) error {
 * Time: 2020/8/22 11:40
 **/
 func QueryArticleInfoByID(id int, article *Article) error {
-	return DB.Select("id", "title", "abstract",
-		"author_id", "create_time").Where("id = ?", id).First(&article).Error
+	return DB.Select("id, title, abstract,"+
+		" author_id, create_time").Where("id = ?", id).First(&article).Error
 }
 
 func QueryArticleDetail(id int) (Article, error) {
@@ -263,4 +263,91 @@ func QueryArticleTotal() (int, error) {
 		return total, nil
 	}
 	return queryArticleTotalByDB()
+}
+
+func addArticleWithCache(newArticle *Article) error {
+	// 更新 ArticleIDList
+	rp := RedisPool.Get()
+	var err error
+	defer func() {
+		rp.Close()
+	}()
+	re, err := rp.Do("RPUSH", consts.ArticleIDListCache, newArticle.ID)
+	log.Println(re)
+	if err != nil {
+		msg := fmt.Sprintf("update %v fail, article id = %v", consts.ArticleIDListCache, newArticle.ID)
+		util.ExceptionLog(err, msg)
+		return err
+	}
+
+	// 更新 ArticleInfo
+	err = setNewArticleInfoToCache(int(re.(int64)), newArticle)
+	if err != nil {
+		msg := fmt.Sprintf("update %v fail, article id = %v", "article info", newArticle.ID)
+		util.ExceptionLog(err, msg)
+	}
+	return err
+}
+
+func AddArticle(newArticle *Article) (*Article, error) {
+	tx := DB.Begin()
+	var err error
+	defer func() {
+		if err != nil {
+			msg := fmt.Sprintf("insert new article fail, title = %v", newArticle.Title)
+			util.ExceptionLog(err, msg)
+			tx.Rollback()
+		}
+		tx.Commit()
+	}()
+	err = tx.Create(newArticle).Error
+	if src.Setting.Redis {
+		_ = addArticleWithCache(newArticle)
+	}
+	return newArticle, err
+}
+
+// TODO: bitmap
+func HasArticle(id int) bool {
+	return true
+}
+
+func updateArticleWithCache(id int, article *Article) error {
+	rc := RedisPool.Get()
+	defer func() {
+		rc.Close()
+	}()
+	value := reflect.ValueOf(article).Elem()
+	for _, field := range fields {
+		err := rc.Send("HSet", consts.ArticleInfoHashCache+strconv.Itoa(id),
+			field, value.FieldByName(field))
+		if err != nil {
+			msg := fmt.Sprintf("send fail, id = %v, field = %v", id, field)
+			util.ExceptionLog(err, msg)
+			return err
+		}
+	}
+	err := rc.Flush()
+	if err != nil {
+		msg := fmt.Sprintf("flush fail, id = %v", id)
+		util.ExceptionLog(err, msg)
+		return err
+	}
+	return nil
+}
+
+func UpdateArticle(id int, article *Article) error {
+	tx := DB.Begin()
+	var err error
+	defer func() {
+		if err != nil {
+			msg := fmt.Sprintf("update article fail, id = %v, title = %v", id, article.Title)
+			util.ExceptionLog(err, msg)
+			tx.Rollback()
+		}
+		tx.Commit()
+	}()
+	err = tx.Model(&Article{}).Where("id = ?", id).Updates(article).Error
+	err = updateArticleWithCache(id, article)
+	return err
 }

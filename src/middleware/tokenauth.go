@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"JuneGoBlog/src/dao"
+	"JuneGoBlog/src/junebao.top/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-func TokenAuth(context *gin.Context) (interface{}, bool) {
+func TokenAuth(context *gin.Context) (middleware.UserBase, bool) {
 	token, err := context.Cookie("SESSIONID")
 	if err != nil {
 		return nil, false

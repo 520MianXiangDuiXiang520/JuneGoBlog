@@ -60,10 +60,24 @@ type ArticleAddResp struct {
 
 type ArticleAddReq struct {
 	dao.Article
-	Tags []dao.Tag `json:"tags"`
+	Tags []int `json:"tags"`
 }
 
 func (r ArticleAddReq) JSON(ctx *gin.Context,
+	jsonReq *junebaotop.BaseReqInter) error {
+	return ctx.ShouldBindJSON(&jsonReq)
+}
+
+type ArticleUpdateResp struct {
+	Header junebaotop.BaseRespHeader `json:"header"`
+}
+
+type ArticleUpdateReq struct {
+	dao.Article
+	Tags []int `json:"tags"`
+}
+
+func (r ArticleUpdateReq) JSON(ctx *gin.Context,
 	jsonReq *junebaotop.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
 }

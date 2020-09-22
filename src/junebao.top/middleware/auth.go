@@ -6,8 +6,12 @@ import (
 	"net/http"
 )
 
+type UserBase interface {
+	GetID() int
+}
+
 // 检查授权，如果授权通过，返回授权用户，否则第二个参数返回 false
-type AuthFunc func(context *gin.Context) (interface{}, bool)
+type AuthFunc func(context *gin.Context) (UserBase, bool)
 
 // 授权中间件，注册使用中间件后，如果授权未通过（af() return nil, false）
 // 请求会被在此拦截并响应 301，反之， 如果授权通过，会在请求上下文对象 context

@@ -15,6 +15,7 @@ func ArticleRegister(rg *gin.RouterGroup) {
 	rg.POST("/detail", articleDetailRoutes()...)
 	rg.POST("/tags", articleTagsRoutes()...)
 	rg.POST("/add", articleAddRoutes()...)
+	rg.POST("/update", articleUpdateRoutes()...)
 }
 
 func articleTagsRoutes() []gin.HandlerFunc {
@@ -40,8 +41,16 @@ func articleListRoutes() []gin.HandlerFunc {
 
 func articleAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.Auth(middleware2.TokenAuth),
 		junebao_top.EasyHandler(check.ArticleAddCheck,
 			server.ArticleAddLogic, &message.ArticleAddReq{}),
+	}
+}
+
+func articleUpdateRoutes() []gin.HandlerFunc {
+	return []gin.HandlerFunc{
 		middleware.Auth(middleware2.TokenAuth),
+		junebao_top.EasyHandler(check.ArticleUpdateCheck,
+			server.ArticleUpdateLogic, &message.ArticleUpdateReq{}),
 	}
 }

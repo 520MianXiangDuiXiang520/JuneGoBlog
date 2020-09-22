@@ -7,7 +7,6 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 )
 
 func ArticleListCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
@@ -42,7 +41,16 @@ func ArticleTagsCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop
 func ArticleAddCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
 	request := req.(*message.ArticleAddReq)
 	if len(request.Title) == 0 || len(request.Text) == 0 ||
-		len(request.Tags) == 0 || request.CreateTime.Unix()-time.Now().Unix() > 0 {
+		len(request.Tags) == 0 {
+		return junebaotop.ParamErrorRespHeader, errors.New("")
+	}
+	return http.StatusOK, nil
+}
+
+func ArticleUpdateCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
+	request := req.(*message.ArticleUpdateReq)
+	if len(request.Title) == 0 || len(request.Text) == 0 ||
+		len(request.Tags) == 0 || !dao.HasArticle(request.ID) {
 		return junebaotop.ParamErrorRespHeader, errors.New("")
 	}
 	return http.StatusOK, nil

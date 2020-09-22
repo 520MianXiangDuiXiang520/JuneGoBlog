@@ -1,6 +1,8 @@
 package server
 
 import (
+	"JuneGoBlog/src"
+	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
@@ -8,6 +10,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"strings"
+	"time"
 )
 
 func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
@@ -107,11 +111,95 @@ func ArticleDetailLogic(ctx *gin.Context,
 	return resp
 }
 
-func ArticleAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+func ArticleAddLogic(ctx *gin.Context,
+	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
 	request := req.(*message.ArticleAddReq)
 	resp := message.ArticleAddResp{}
-	// TODO:...
-	log.Println(request)
+	if len(request.Abstract) <= 0 {
+		request.Abstract = getAbstract(request.Text)
+	}
+	user, ok := ctx.Get("user")
+	if !ok {
+		return junebaotop.UnauthorizedRespHeader
+	}
+	author := user.(*dao.User)
+	newArticle := dao.Article{
+		Text:       request.Text,
+		Title:      request.Title,
+		AuthorID:   author.ID,
+		Abstract:   request.Abstract,
+		CreateTime: time.Now(),
+	}
+	_, err := dao.AddArticle(&newArticle)
+	for _, tagID := range request.Tags {
+		tag := dao.QueryTagByID(tagID)
+		if tag == nil {
+			return junebaotop.ParamErrorRespHeader
+		}
+		err := dao.InsertArticleTag(&dao.ArticleTags{
+			ArticleID: newArticle.ID,
+			TagID:     tagID,
+		})
+		if err != nil {
+			return junebaotop.SystemErrorRespHeader
+		}
+	}
+	if err != nil {
+		return junebaotop.SystemErrorRespHeader
+	}
+	resp.Header = junebaotop.SuccessRespHeader
+	return resp
+}
+
+func getAbstract(text string) string {
+	abstractList := strings.Split(text, consts.AbstractSplitStr)
+	sp := src.Setting.AbstractLen
+	if sp > len(text) {
+		sp = len(text)
+	}
+	if len(abstractList) < 2 {
+		return text[:sp]
+	}
+	return abstractList[0]
+}
+
+func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	request := req.(*message.ArticleUpdateReq)
+	resp := message.ArticleUpdateResp{}
+
+	if request.CreateTime.Unix() < 0 {
+		request.CreateTime = time.Now()
+	}
+
+	user, ok := ctx.Get("user")
+	if !ok {
+		return junebaotop.UnauthorizedRespHeader
+	}
+	author := user.(*dao.User)
+
+	abstract := request.Abstract
+	if abstract == "" {
+		abstract = getAbstract(request.Text)
+	}
+
+	// update article table
+	err := dao.UpdateArticle(request.ID, &dao.Article{
+		ID:         request.ID,
+		Text:       request.Text,
+		Title:      request.Title,
+		AuthorID:   author.ID,
+		Abstract:   abstract,
+		CreateTime: request.CreateTime,
+	})
+	if err != nil {
+		return junebaotop.SystemErrorRespHeader
+	}
+	// update article_tag table
+	err = dao.UpdateArticleTagsByIntList(request.ID, request.Tags)
+	if err != nil {
+		return junebaotop.SystemErrorRespHeader
+	}
+
 	resp.Header = junebaotop.SuccessRespHeader
 	return resp
 }

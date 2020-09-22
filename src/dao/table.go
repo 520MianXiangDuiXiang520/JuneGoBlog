@@ -34,6 +34,10 @@ type User struct {
 	Permiter int    `json:"permiter" gorm:"column:permit"`
 }
 
+func (u User) GetID() int {
+	return u.ID
+}
+
 func (User) TableName() string {
 	return "users"
 }
