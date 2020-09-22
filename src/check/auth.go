@@ -29,3 +29,7 @@ func AuthLoginCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top
 func AuthInfoCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
 	return http.StatusOK, nil
 }
+
+func AuthLogoutCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+	return http.StatusOK, nil
+}

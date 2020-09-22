@@ -45,3 +45,20 @@ func AuthInfoLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.Bas
 	resp.Header = junebaotop.SuccessRespHeader
 	return resp
 }
+
+func AuthLogoutLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	resp := message.AuthLogoutResp{}
+	u, ok := ctx.Get("user")
+	if !ok {
+		return junebaotop.UnauthorizedRespHeader
+	}
+	user := u.(*dao.User)
+	err := dao.DeleteUserTokenByUID(user.ID)
+	if err != nil {
+		msg := fmt.Sprintf("logout fail(delete user token fail), uid = %v", user.ID)
+		util.ExceptionLog(err, msg)
+		return junebaotop.SystemErrorRespHeader
+	}
+	resp.Header = junebaotop.SuccessRespHeader
+	return resp
+}

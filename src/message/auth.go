@@ -34,3 +34,15 @@ func (r AuthInfoReq) JSON(ctx *gin.Context,
 	jsonReq *junebao_top.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
 }
+
+type AuthLogoutResp struct {
+	Header junebao_top.BaseRespHeader `json:"header"`
+}
+
+type AuthLogoutReq struct {
+}
+
+func (r AuthLogoutReq) JSON(ctx *gin.Context,
+	jsonReq *junebao_top.BaseReqInter) error {
+	return ctx.ShouldBindJSON(&jsonReq)
+}

@@ -13,7 +13,7 @@ import (
 func AuthRegister(rg *gin.RouterGroup) {
 	rg.POST("/login", authLoginRoutes()...)
 	rg.POST("/info", authInfoRoutes()...) // 获取用户信息
-
+	rg.POST("/logout", authLogoutRoutes()...)
 }
 
 func authLoginRoutes() []gin.HandlerFunc {
@@ -28,5 +28,13 @@ func authInfoRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		junebao_top.EasyHandler(check.AuthInfoCheck,
 			server.AuthInfoLogic, &message.AuthInfoReq{}),
+	}
+}
+
+func authLogoutRoutes() []gin.HandlerFunc {
+	return []gin.HandlerFunc{
+		middleware.Auth(middleware2.TokenAuth),
+		junebao_top.EasyHandler(check.AuthLogoutCheck,
+			server.AuthLogoutLogic, &message.AuthLogoutReq{}),
 	}
 }
