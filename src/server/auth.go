@@ -31,3 +31,17 @@ func AuthLoginLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.Ba
 	resp.Header = junebaotop.SuccessRespHeader
 	return resp
 }
+
+func AuthInfoLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	resp := message.AuthInfoResp{}
+	u, ok := ctx.Get("user")
+	if !ok {
+		return junebaotop.UnauthorizedRespHeader
+	}
+	user := u.(*dao.User)
+	resp.ID = user.ID
+	resp.Username = user.Username
+	resp.Permiter = user.Permiter
+	resp.Header = junebaotop.SuccessRespHeader
+	return resp
+}

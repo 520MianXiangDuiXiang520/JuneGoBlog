@@ -19,3 +19,18 @@ func (r AuthLoginReq) JSON(ctx *gin.Context,
 	jsonReq *junebao_top.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
 }
+
+type AuthInfoResp struct {
+	Header   junebao_top.BaseRespHeader `json:"header"`
+	ID       int                        `json:"id"`
+	Username string                     `json:"username"`
+	Permiter int                        `json:"permiter"`
+}
+
+type AuthInfoReq struct {
+}
+
+func (r AuthInfoReq) JSON(ctx *gin.Context,
+	jsonReq *junebao_top.BaseReqInter) error {
+	return ctx.ShouldBindJSON(&jsonReq)
+}
