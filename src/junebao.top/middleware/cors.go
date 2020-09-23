@@ -6,11 +6,24 @@ import (
 	"net/http"
 )
 
+// 允许白名单
+var AccessControlAllowOrigin []string = []string{
+	"http://localhost:8081",
+	"http://localhost:8082",
+	"http://127.0.0.1:8081",
+	"http://127.0.0.1:8082",
+}
+
 func CorsHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
+		origin := context.GetHeader("Origin")
 		method := context.Request.Method
 		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Origin", "http://localhost:8081") // 设置允许访问所有域
+		for _, allow := range AccessControlAllowOrigin {
+			if allow == origin {
+				context.Header("Access-Control-Allow-Origin", origin)
+			}
+		}
 		context.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 		context.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, X-CSRF-Token, Token,"+
 			"session,X_Requested_With,Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language,DNT,"+
