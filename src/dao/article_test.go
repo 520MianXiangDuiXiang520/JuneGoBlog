@@ -23,3 +23,10 @@ func TestQueryArticleInfoByID(t *testing.T) {
 	}
 	log.Println(a)
 }
+
+func TestQueryArticleInfoByLimit(t *testing.T) {
+	al, _ := QueryArticleInfoByLimit(1, 10, 10)
+	for _, a := range al {
+		log.Println(a.Title)
+	}
+}

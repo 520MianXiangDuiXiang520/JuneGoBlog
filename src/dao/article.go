@@ -215,12 +215,12 @@ func QueryArticleInfoByLimit(page, pageSize, total int) ([]Article, error) {
 		pageSize = newPageSize
 	}
 	articleList := make([]Article, 0)
-	al := DB.Limit(pageSize).Offset(start).Find(&articleList)
+	al := DB.Order("create_time desc").Limit(pageSize).Offset(start).Find(&articleList)
 	return articleList, al.Error
 }
 
 func QueryAllArticle(articleList *[]Article) error {
-	return DB.Find(&articleList).Error
+	return DB.Order("create_time desc").Find(&articleList).Error
 }
 
 /**
