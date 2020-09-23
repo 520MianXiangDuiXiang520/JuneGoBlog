@@ -27,6 +27,8 @@ func articleTagsRoutes() []gin.HandlerFunc {
 
 func articleDetailRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.Auth(middleware2.TokenAuth),
+		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.ArticleDetailCheck,
 			server.ArticleDetailLogic, &message.ArticleDetailReq{}),
 	}
@@ -42,6 +44,7 @@ func articleListRoutes() []gin.HandlerFunc {
 func articleAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		middleware.Auth(middleware2.TokenAuth),
+		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.ArticleAddCheck,
 			server.ArticleAddLogic, &message.ArticleAddReq{}),
 	}
@@ -50,6 +53,7 @@ func articleAddRoutes() []gin.HandlerFunc {
 func articleUpdateRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		middleware.Auth(middleware2.TokenAuth),
+		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.ArticleUpdateCheck,
 			server.ArticleUpdateLogic, &message.ArticleUpdateReq{}),
 	}
