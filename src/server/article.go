@@ -85,7 +85,7 @@ func ArticleListLogic(ctx *gin.Context,
 			Tags:       tags,
 			ID:         article.ID,
 			Title:      article.Title,
-			CreateTime: article.CreateTime,
+			CreateTime: article.CreateTime.Unix(),
 			Abstract:   article.Abstract,
 			Author:     "Junebao",
 		})
