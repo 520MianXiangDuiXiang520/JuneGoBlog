@@ -13,5 +13,5 @@ func TestGetHashWithTimeUUID(t *testing.T) {
 }
 
 func TestSha256(t *testing.T) {
-	log.Println(Sha256("123"))
+	log.Println(Sha256("test"))
 }

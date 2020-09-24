@@ -17,7 +17,7 @@ func TestUpdateArticle(t *testing.T) {
 
 func TestQueryArticleInfoByID(t *testing.T) {
 	a := Article{}
-	err := QueryArticleInfoByID(48, &a)
+	err := QueryArticleByIDWithDB(48, &a)
 	if err != nil {
 		t.Error("查询失败！")
 	}

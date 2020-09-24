@@ -10,9 +10,9 @@ func QueryAllTagsOrderByTime(resp *[]Tag) error {
 	return DB.Order("create_time").Find(&resp).Error
 }
 
-func HasTagByName(name string) (*Tag, bool) {
+func HasTagByID(tagID int) (*Tag, bool) {
 	tag := new(Tag)
-	DB.Where("name = ?", name).First(&tag)
+	DB.Where("id = ?", tagID).First(&tag)
 	if tag.ID == 0 {
 		return nil, false
 	}

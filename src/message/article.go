@@ -18,15 +18,15 @@ type ArticleTagsReq struct {
 
 type ArticleListResp struct {
 	Header      junebaotop.BaseRespHeader `json:"header"`      // 响应头
-	ArticleList []dao.ArticleInfo         `json:"articleList"` // 文章列表
+	ArticleList []dao.ArticleListInfo     `json:"articleList"` // 文章列表
 	Total       int                       `json:"total"`       // 将返回的文章总数
 }
 
 // 请求文章列表格式
 type ArticleListReq struct {
-	Page     int    `json:"page"form:"page"`         // 页数
-	PageSize int    `json:"pageSize"form:"pageSize"` // 每页请求的文章数量
-	Tag      string `json:"tag"form:"tag"`           // 标签
+	Page     int `json:"page"form:"page"`         // 页数
+	PageSize int `json:"pageSize"form:"pageSize"` // 每页请求的文章数量
+	Tag      int `json:"tag"form:"tag"`           // 标签
 }
 
 type ArticleDetailReq struct {

@@ -98,7 +98,7 @@ func setNewArticleInfoToCache(id int, article *Article) error {
 **/
 func articleInfoMissHitsUpdate(id int) (Article, error) {
 	articleDB := Article{}
-	err := QueryArticleInfoByID(id, &articleDB)
+	err := QueryArticleByIDWithDB(id, &articleDB)
 	if err != nil {
 		log.Printf("缓存未命中后从数据库中获取信息失败！id = [%v]", id)
 		return articleDB, err
@@ -219,6 +219,40 @@ func QueryArticleInfoByLimit(page, pageSize, total int) ([]Article, error) {
 	return articleList, al.Error
 }
 
+/**
+* WiKi: 查询某个 Tag 下的单页文章信息
+* Author: JuneBao
+* Time: 2020/9/24 10:56
+**/
+func QueryArticleInfoByLimitWithTag(tagID, page, pageSize int) ([]Article, int, error) {
+	articleTags, err := QueryAllArticleByTagID(tagID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	total := len(articleTags)
+	start := (page - 1) * pageSize
+	newPageSize := total - start
+	if newPageSize < pageSize {
+		pageSize = newPageSize
+	}
+
+	articleList := make([]Article, 0)
+	log.Printf("total = %v, pageSize = %v", total, pageSize)
+	if total > pageSize {
+		articleTags = articleTags[start : start+pageSize]
+	}
+
+	for _, a := range articleTags {
+		article, err := QueryArticleByID(a.ArticleID)
+		if err != nil {
+			return nil, 0, err
+		}
+		articleList = append(articleList, article)
+	}
+	return articleList, total, nil
+}
+
 func QueryAllArticle(articleList *[]Article) error {
 	return DB.Order("create_time desc").Find(&articleList).Error
 }
@@ -228,9 +262,23 @@ func QueryAllArticle(articleList *[]Article) error {
 * Author: JuneBao
 * Time: 2020/8/22 11:40
 **/
-func QueryArticleInfoByID(id int, article *Article) error {
+func QueryArticleByIDWithDB(id int, article *Article) error {
 	return DB.Select("id, title, abstract,"+
 		" author_id, create_time").Where("id = ?", id).First(&article).Error
+}
+
+/**
+* WiKi: 通过 ID 查询文章信息
+* Author: JuneBao
+* Time: 2020/9/24 10:56
+**/
+func QueryArticleByID(id int) (Article, error) {
+	var article Article
+	if src.Setting.Redis {
+		return queryArticleInfoFromCache(id)
+	}
+	err := QueryArticleByIDWithDB(id, &article)
+	return article, err
 }
 
 func QueryArticleDetail(id int) (Article, error) {
@@ -280,7 +328,7 @@ func addArticleWithCache(newArticle *Article) error {
 		return err
 	}
 
-	// 更新 ArticleInfo
+	// 更新 ArticleListInfo
 	err = setNewArticleInfoToCache(int(re.(int64)), newArticle)
 	if err != nil {
 		msg := fmt.Sprintf("update %v fail, article id = %v", "article info", newArticle.ID)

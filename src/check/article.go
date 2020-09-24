@@ -14,8 +14,8 @@ func ArticleListCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop
 	if reqL.PageSize <= 0 || reqL.Page <= 0 {
 		return junebaotop.ParamErrorRespHeader, errors.New("ParamError")
 	}
-	if reqL.Tag != "" {
-		if _, ok := dao.HasTagByName(reqL.Tag); !ok {
+	if reqL.Tag != 0 {
+		if _, ok := dao.HasTagByID(reqL.Tag); !ok {
 			return junebaotop.ParamErrorRespHeader, errors.New("TagNotFind")
 		}
 	}

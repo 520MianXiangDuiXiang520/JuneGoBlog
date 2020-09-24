@@ -135,3 +135,22 @@ func UpdateArticleTagsByIntList(articleID int, intTags []int) error {
 	}
 	return UpdateArticleTags(articleID, tags)
 }
+
+/**
+* WiKi: 查询 tagID 下的所有文章， 返回的是 ArticleTags 切片
+* Author: JuneBao
+* Time: 2020/9/24 10:58
+**/
+func QueryAllArticleByTagID(tagID int) ([]ArticleTags, error) {
+	// TODO: 使用缓存
+	result := make([]ArticleTags, 0)
+	DB.LogMode(true)
+	err := DB.Model(&ArticleTags{}).Where("tag_id = ?", tagID).Find(&result).Error
+
+	if err != nil {
+		msg := fmt.Sprintf("Query All Article By TagID fail, tagid = %v", tagID)
+		util.ExceptionLog(err, msg)
+		return nil, err
+	}
+	return result, err
+}

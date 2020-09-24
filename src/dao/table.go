@@ -63,7 +63,7 @@ type Article struct {
 }
 
 // 文章信息
-type ArticleInfo struct {
+type ArticleListInfo struct {
 	ID         int    `json:"id"`
 	Title      string `json:"title"`
 	Abstract   string `json:"abstract"`
