@@ -190,3 +190,14 @@ func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaoto
 	resp.Header = junebaotop.SuccessRespHeader
 	return resp
 }
+
+func ArticleDeleteLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	request := req.(*message.ArticleDeleteReq)
+	resp := message.ArticleDeleteResp{}
+	err := dao.DeleteArticle(request.ID)
+	if err != nil {
+		return junebaotop.SystemErrorRespHeader
+	}
+	resp.Header = junebaotop.SuccessRespHeader
+	return resp
+}

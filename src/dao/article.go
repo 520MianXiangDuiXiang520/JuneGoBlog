@@ -548,3 +548,80 @@ func UpdateArticle(id int, article *Article) error {
 	}
 	return nil
 }
+
+func deleteArticleFromDB(id int) error {
+	DB.LogMode(true)
+	tx := DB.Begin()
+	var err error
+	defer func() {
+		if err != nil {
+			msg := fmt.Sprintf("Fail to delete article from db, article id = %v", id)
+			util.ExceptionLog(err, msg)
+			tx.Rollback()
+		}
+		tx.Commit()
+	}()
+	// 删除 article 表中的数据
+	err = tx.Where("id = ?", id).Delete(&Article{}).Error
+	// 删除 article_tag 表中的数据
+	err = tx.Where("article_id = ?", id).Delete(&ArticleTags{}).Error
+	return err
+}
+
+func deleteArticleIDListCacheByID(id int) error {
+	rc := RedisPool.Get()
+	defer rc.Close()
+
+	_, err := rc.Do("LREM", consts.ArticleIDListCache, 0, id)
+	if err != nil {
+		msg := fmt.Sprintf("Fail to delete ArticleIDListCache by id, id = %v", id)
+		util.ExceptionLog(err, msg)
+		return err
+	}
+	return nil
+}
+
+func deleteArticleInfoHashCacheByID(id int) error {
+	rc := RedisPool.Get()
+	defer rc.Close()
+
+	_, err := rc.Do("DEL", consts.ArticleInfoHashCache+strconv.Itoa(id))
+	if err != nil {
+		msg := fmt.Sprintf("Fail to delete ArticleInfoHashCache by id, id = %v", id)
+		util.ExceptionLog(err, msg)
+		return err
+	}
+	return nil
+}
+
+func deleteArticleFromCache(id int) error {
+	// 修改 ArticleIDListCache
+	err := deleteArticleIDListCacheByID(id)
+	if err != nil {
+		return err
+	}
+	// 删除 ArticleInfoHashCache
+	err = deleteArticleInfoHashCacheByID(id)
+	if err != nil {
+		return err
+	}
+
+	// TODO: 修改 BitMap
+	return nil
+}
+
+func DeleteArticle(id int) error {
+	// 1. 从数据库中删除
+	err := deleteArticleFromDB(id)
+	if err != nil {
+		return err
+	}
+	// 2. 从 Redis 中删除
+	if src.Setting.Redis {
+		err := deleteArticleFromCache(id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

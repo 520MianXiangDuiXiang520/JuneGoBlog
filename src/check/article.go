@@ -55,3 +55,11 @@ func ArticleUpdateCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaot
 	}
 	return http.StatusOK, nil
 }
+
+func ArticleDeleteCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
+	request := req.(*message.ArticleDeleteReq)
+	if request.ID <= 0 || !dao.HasArticle(request.ID) {
+		return nil, errors.New("ArticleDoesNotExist")
+	}
+	return http.StatusOK, nil
+}

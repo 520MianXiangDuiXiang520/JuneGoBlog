@@ -13,3 +13,7 @@ func TestUpdateArticle(t *testing.T) {
 		AuthorID:   1,
 	})
 }
+
+func TestGetArticleIDListCacheIndexByID(t *testing.T) {
+	_, _ = getArticleIDListCacheIndexByID(1)
+}

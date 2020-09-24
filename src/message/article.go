@@ -81,3 +81,16 @@ func (r ArticleUpdateReq) JSON(ctx *gin.Context,
 	jsonReq *junebaotop.BaseReqInter) error {
 	return ctx.ShouldBindJSON(&jsonReq)
 }
+
+type ArticleDeleteResp struct {
+	Header junebaotop.BaseRespHeader `json:"header"`
+}
+
+type ArticleDeleteReq struct {
+	ID int `json:"id"`
+}
+
+func (r ArticleDeleteReq) JSON(ctx *gin.Context,
+	jsonReq *junebaotop.BaseReqInter) error {
+	return ctx.ShouldBindJSON(&jsonReq)
+}
