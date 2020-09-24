@@ -57,11 +57,50 @@ func ArticleTagsLogic(ctx *gin.Context,
 	return resp
 }
 
+func articleListByTag(tagID, page, pageSize int) (*message.ArticleListResp, error) {
+
+	articleList, total, err := dao.QueryArticleInfoByLimitWithTag(tagID, page, pageSize)
+	result := make([]dao.ArticleListInfo, len(articleList))
+	if err != nil {
+		return nil, err
+	}
+	for i, al := range articleList {
+		tags := make([]dao.Tag, 0)
+		err := dao.QueryAllTagsByArticleID(al.ID, &tags)
+		if err != nil {
+			msg := fmt.Sprintf("get article tags fail, article id = %v", al.ID)
+			util.ExceptionLog(err, msg)
+			return nil, err
+		}
+		result[i] = dao.ArticleListInfo{
+			ID:         al.ID,
+			Title:      al.Title,
+			Abstract:   al.Abstract,
+			CreateTime: al.CreateTime.Unix(),
+			Author:     "Junebao",
+			Tags:       tags,
+		}
+	}
+	return &message.ArticleListResp{
+		Header:      junebaotop.SuccessRespHeader,
+		ArticleList: result,
+		Total:       total,
+	}, nil
+}
+
 // 文章列表逻辑
 func ArticleListLogic(ctx *gin.Context,
 	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
 	reqL := req.(*message.ArticleListReq)
 	resp := message.ArticleListResp{}
+	if reqL.Tag != 0 {
+		response, err := articleListByTag(reqL.Tag, reqL.Page, reqL.PageSize)
+		if err != nil {
+			return junebaotop.SystemErrorRespHeader
+		}
+		return response
+	}
+
 	total, err := dao.QueryArticleTotal()
 	if err != nil {
 		log.Printf("获取文章总数失败！")
@@ -73,7 +112,7 @@ func ArticleListLogic(ctx *gin.Context,
 		log.Printf("QueryArticleInfoByLimit Error !")
 		return junebaotop.SystemErrorRespHeader
 	}
-	resp.ArticleList = make([]dao.ArticleInfo, 0)
+	resp.ArticleList = make([]dao.ArticleListInfo, 0)
 	for _, article := range articleList {
 		tags := make([]dao.Tag, 0)
 		err := dao.QueryAllTagsByArticleID(article.ID, &tags)
@@ -81,7 +120,7 @@ func ArticleListLogic(ctx *gin.Context,
 			msg := fmt.Sprintf("get article tags fail, article id = %v", article.ID)
 			util.ExceptionLog(err, msg)
 		}
-		resp.ArticleList = append(resp.ArticleList, dao.ArticleInfo{
+		resp.ArticleList = append(resp.ArticleList, dao.ArticleListInfo{
 			Tags:       tags,
 			ID:         article.ID,
 			Title:      article.Title,
@@ -115,14 +154,16 @@ func ArticleAddLogic(ctx *gin.Context,
 	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
 	request := req.(*message.ArticleAddReq)
 	resp := message.ArticleAddResp{}
-	if len(request.Abstract) <= 0 {
-		request.Abstract = getAbstract(request.Text)
-	}
 	user, ok := ctx.Get("user")
 	if !ok {
 		return junebaotop.UnauthorizedRespHeader
 	}
 	author := user.(*dao.User)
+
+	if len(request.Abstract) <= 0 {
+		request.Abstract = getAbstract(request.Text)
+	}
+
 	newArticle := dao.Article{
 		Text:       request.Text,
 		Title:      request.Title,
@@ -167,15 +208,15 @@ func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaoto
 	request := req.(*message.ArticleUpdateReq)
 	resp := message.ArticleUpdateResp{}
 
-	if request.CreateTime.Unix() < 0 {
-		request.CreateTime = time.Now()
-	}
-
 	user, ok := ctx.Get("user")
 	if !ok {
 		return junebaotop.UnauthorizedRespHeader
 	}
 	author := user.(*dao.User)
+
+	if request.CreateTime.Unix() < 0 {
+		request.CreateTime = time.Now()
+	}
 
 	abstract := request.Abstract
 	if abstract == "" {
