@@ -9,7 +9,6 @@ import (
 	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"strings"
 	"time"
 )
@@ -60,30 +59,12 @@ func ArticleTagsLogic(ctx *gin.Context,
 func articleListByTag(tagID, page, pageSize int) (*message.ArticleListResp, error) {
 
 	articleList, total, err := dao.QueryArticleInfoByLimitWithTag(tagID, page, pageSize)
-	result := make([]dao.ArticleListInfo, len(articleList))
 	if err != nil {
 		return nil, err
 	}
-	for i, al := range articleList {
-		tags := make([]dao.Tag, 0)
-		err := dao.QueryAllTagsByArticleID(al.ID, &tags)
-		if err != nil {
-			msg := fmt.Sprintf("get article tags fail, article id = %v", al.ID)
-			util.ExceptionLog(err, msg)
-			return nil, err
-		}
-		result[i] = dao.ArticleListInfo{
-			ID:         al.ID,
-			Title:      al.Title,
-			Abstract:   al.Abstract,
-			CreateTime: al.CreateTime.Unix(),
-			Author:     "Junebao",
-			Tags:       tags,
-		}
-	}
 	return &message.ArticleListResp{
 		Header:      junebaotop.SuccessRespHeader,
-		ArticleList: result,
+		ArticleList: articleList,
 		Total:       total,
 	}, nil
 }
@@ -93,6 +74,7 @@ func ArticleListLogic(ctx *gin.Context,
 	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
 	reqL := req.(*message.ArticleListReq)
 	resp := message.ArticleListResp{}
+
 	if reqL.Tag != 0 {
 		response, err := articleListByTag(reqL.Tag, reqL.Page, reqL.PageSize)
 		if err != nil {
@@ -101,34 +83,11 @@ func ArticleListLogic(ctx *gin.Context,
 		return response
 	}
 
-	total, err := dao.QueryArticleTotal()
+	articleList, total, err := dao.QueryArticleInfoByLimit(reqL.Page, reqL.PageSize)
 	if err != nil {
-		log.Printf("获取文章总数失败！")
 		return junebaotop.SystemErrorRespHeader
 	}
-
-	articleList, err := dao.QueryArticleInfoByLimit(reqL.Page, reqL.PageSize, total)
-	if err != nil {
-		log.Printf("QueryArticleInfoByLimit Error !")
-		return junebaotop.SystemErrorRespHeader
-	}
-	resp.ArticleList = make([]dao.ArticleListInfo, 0)
-	for _, article := range articleList {
-		tags := make([]dao.Tag, 0)
-		err := dao.QueryAllTagsByArticleID(article.ID, &tags)
-		if err != nil {
-			msg := fmt.Sprintf("get article tags fail, article id = %v", article.ID)
-			util.ExceptionLog(err, msg)
-		}
-		resp.ArticleList = append(resp.ArticleList, dao.ArticleListInfo{
-			Tags:       tags,
-			ID:         article.ID,
-			Title:      article.Title,
-			CreateTime: article.CreateTime.Unix(),
-			Abstract:   article.Abstract,
-			Author:     "Junebao",
-		})
-	}
+	resp.ArticleList = articleList
 	resp.Header = junebaotop.SuccessRespHeader
 	resp.Total = total
 	return resp
@@ -171,20 +130,7 @@ func ArticleAddLogic(ctx *gin.Context,
 		Abstract:   request.Abstract,
 		CreateTime: time.Now(),
 	}
-	_, err := dao.AddArticle(&newArticle)
-	for _, tagID := range request.Tags {
-		tag := dao.QueryTagByID(tagID)
-		if tag == nil {
-			return junebaotop.ParamErrorRespHeader
-		}
-		err := dao.InsertArticleTag(&dao.ArticleTags{
-			ArticleID: newArticle.ID,
-			TagID:     tagID,
-		})
-		if err != nil {
-			return junebaotop.SystemErrorRespHeader
-		}
-	}
+	_, err := dao.AddArticle(&newArticle, request.Tags)
 	if err != nil {
 		return junebaotop.SystemErrorRespHeader
 	}

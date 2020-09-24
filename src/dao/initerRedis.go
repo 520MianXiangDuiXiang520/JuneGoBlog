@@ -27,25 +27,10 @@ func InitArticleIDListCache() error {
 	// 1. 更新缓存中的 articleIDList
 	rc := RedisPool.Get()
 	defer rc.Close()
-	for index, article := range articleList {
-		value, err := redis.String(rc.Do("LINDEX", consts.ArticleIDListCache, index))
-		if err != nil {
-			log.Println("Get Error!")
-			return err
-		}
-		if value == "" {
-			err := rc.Send("RPUSH", consts.ArticleIDListCache, article.ID)
-			if err != nil {
-				log.Println("插入ID失败", err)
-				return err
-			}
-		} else if value != strconv.Itoa(article.ID) {
-			if err := rc.Send("lset", consts.ArticleIDListCache,
-				int64(index), article.ID); err != nil {
-				log.Println("LSET 执行失败")
-			}
-		}
+	for _, article := range articleList {
+		_ = rc.Send("RPUSH", consts.ArticleIDListCache, article.ID)
 	}
+	_ = rc.Flush()
 	return nil
 }
 

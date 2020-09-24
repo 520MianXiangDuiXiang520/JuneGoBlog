@@ -10,8 +10,6 @@ import (
 var AccessControlAllowOrigin []string = []string{
 	"http://localhost:8081",
 	"http://localhost:8082",
-	"http://127.0.0.1:8081",
-	"http://127.0.0.1:8082",
 }
 
 func CorsHandler() gin.HandlerFunc {
@@ -22,6 +20,7 @@ func CorsHandler() gin.HandlerFunc {
 		for _, allow := range AccessControlAllowOrigin {
 			if allow == origin {
 				context.Header("Access-Control-Allow-Origin", origin)
+				break
 			}
 		}
 		context.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")

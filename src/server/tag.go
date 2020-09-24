@@ -17,10 +17,13 @@ func TagListLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.Ba
 	}
 	tagInfos := make([]message.TagInfo, 0)
 	for _, tag := range tags {
+		articleTotal, err := dao.QueryArticleTotalByTagID(tag.ID)
+		if err != nil {
+			return junebao_top.SystemErrorRespHeader
+		}
 		tagInfos = append(tagInfos, message.TagInfo{
-			// TODO: 从 article 表中查
 			ID:           tag.ID,
-			ArticleTotal: 10,
+			ArticleTotal: articleTotal,
 			Name:         tag.Name,
 			CreateTime:   tag.CreateTime.Unix(),
 		})

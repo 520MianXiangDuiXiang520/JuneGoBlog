@@ -27,3 +27,5 @@ const (
 	VisitorPermission = 1 // 游客
 	AdminPermission   = 2 // 管理员
 )
+
+const CacheTagsSplitStr = "-"

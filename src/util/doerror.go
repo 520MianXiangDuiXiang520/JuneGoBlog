@@ -10,6 +10,12 @@ func ExceptionLog(e error, mes string) {
 		pc, _, line, _ := runtime.Caller(1)
 		fName := runtime.FuncForPC(pc).Name()
 		log.Printf("[Error] %v:%v  %v", fName, line, mes)
-		log.Printf("[Info] %v", e)
+		log.Printf("[Error] %v", e)
 	}
+}
+
+func LogPlus(msg string) {
+	pc, _, line, _ := runtime.Caller(1)
+	fName := runtime.FuncForPC(pc).Name()
+	log.Printf("[Info] %v:%v  %v", fName, line, msg)
 }
