@@ -169,5 +169,5 @@ func QueryTagByID(id int) (*Tag, error) {
 	if src.Setting.Redis {
 		return queryTagByIDFromCache(id)
 	}
-	return QueryTagByID(id)
+	return queryTagByIDFromDB(id)
 }
