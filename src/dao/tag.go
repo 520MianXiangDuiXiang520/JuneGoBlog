@@ -5,7 +5,6 @@ import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/util"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"time"
@@ -25,26 +24,65 @@ func HasTagByID(tagID int) (*Tag, bool) {
 	return tag, true
 }
 
-func AddTag(name string) error {
+func addTagFromDB(name string) (*Tag, error) {
 	tx := DB.Begin()
-	if err := tx.Error; err != nil {
-		log.Printf("AddTag Begin Error, Name = [%v], : [%v]\n", name, err)
-		return err
-	}
 	var err error
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			log.Printf("AddTag Error, Callbacked... tagName = [%v]; [%v]", name, err)
+			msg := fmt.Sprintf("Fail to add tag with DB, tag name = %v", name)
+			util.ExceptionLog(err, msg)
 		}
 		tx.Commit()
 	}()
-
-	err = tx.Create(&Tag{
+	newTag := Tag{
 		Name:       name,
 		CreateTime: time.Now(),
-	}).Error
-	return err
+	}
+	err = tx.Create(&newTag).Error
+	return &newTag, err
+}
+
+func addTagFromCache(tag *Tag) error {
+	rc := RedisPool.Get()
+	var err error
+	_, err = rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "ID", tag.ID)
+	if err != nil {
+		msg := fmt.Sprintf("Fail to Send TagsInfoHashCache:%v field = %v", tag.ID, "ID")
+		util.ExceptionLog(err, msg)
+		return err
+	}
+
+	_, err = rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "Name", tag.Name)
+	if err != nil {
+		msg := fmt.Sprintf("Fail to Send TagsInfoHashCache:%v field = %v", tag.ID, "Name")
+		util.ExceptionLog(err, msg)
+		return err
+	}
+
+	_, err = rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID),
+		"CreateTime", tag.CreateTime.Unix())
+	if err != nil {
+		msg := fmt.Sprintf("Fail to Send TagsInfoHashCache:%v field = %v", tag.ID, "CreateTime")
+		util.ExceptionLog(err, msg)
+		return err
+	}
+
+	return nil
+}
+
+func AddTag(name string) error {
+	tag, err := addTagFromDB(name)
+	if err != nil {
+		return err
+	}
+	if src.Setting.Redis {
+		err := addTagFromCache(tag)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func insertTagToCache(tag *Tag) error {
@@ -117,7 +155,9 @@ func queryTagByIDFromCache(id int) (*Tag, error) {
 		}
 	}
 	tagID, _ := strconv.Atoi(cacheReturnResults[0])
-	createTime, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", cacheReturnResults[2])
+	// Redis 中的时间改用时间戳存储
+	uTime, _ := strconv.Atoi(cacheReturnResults[2])
+	createTime := time.Unix(int64(uTime), 0)
 	return &Tag{
 		ID:         tagID,
 		Name:       cacheReturnResults[1],
