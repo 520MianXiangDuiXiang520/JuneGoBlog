@@ -1,36 +1,39 @@
 language: go
 go:
-  - '1.14'
-
+- '1.14'
 before_install:
-  - go get github.com/mattn/goveralls
-
+- openssl aes-256-cbc -K $encrypted_9b2d7e19d83c_key -iv $encrypted_9b2d7e19d83c_iv
+  -in id_rsa.enc -out ~\/.ssh/id_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ~/.ssh/id_rsa
+- ssh-add ~/.ssh/id_rsa
+- go get github.com/mattn/goveralls
 before_script:
-  - touch secret.ini
-  - echo "[mysql]" >> secret.ini
-  - echo "user=$MySQL_USER" >> secret.ini
-  - echo "password=$MySQL_PASSWORD" >> secret.ini
-  - echo "ip=$MySQL_IP" >> secret.ini
-  - echo "port=$MySQL_PORT" >> secret.ini
-  - echo "dbname=$MySQL_DBNAME" >> secret.ini
-  - echo "[redis]" >> secret.ini
-  - echo "host=$Redis_Host" >> secret.ini
-  - echo "port=$Redis_Port" >> secret.ini
-  - echo "password=$Redis_Password" >> secret.ini
-
+- touch secret.ini
+- echo "[mysql]" >> secret.ini
+- echo "user=$MySQL_USER" >> secret.ini
+- echo "password=$MySQL_PASSWORD" >> secret.ini
+- echo "ip=$MySQL_IP" >> secret.ini
+- echo "port=$MySQL_PORT" >> secret.ini
+- echo "dbname=$MySQL_DBNAME" >> secret.ini
+- echo "[redis]" >> secret.ini
+- echo "host=$Redis_Host" >> secret.ini
+- echo "port=$Redis_Port" >> secret.ini
+- echo "password=$Redis_Password" >> secret.ini
 script:
-  - ls && make build && ls
-  - goveralls -service=travis-ci
-  
-
+- ls && make build && ls
+- goveralls -service=travis-ci
 deploy:
   provider: pages
   skip_cleanup: true
   keep_history: true
-  github_token: $GitHub_Token  # Your GitHub token set in Travis CI console
-  target_branch: master        # Add this line - To push into GitHub master branch
+  github_token: "$GitHub_Token"
+  target_branch: master
   on:
-    branch: master            # Your GitHub repo default branch
-
-after_script:
-  rm -rf secret.ini
+    branch: master
+after_script: rm -rf secret.ini
+addons:
+    ssh_known_hosts: 39.106.168.39
+after_success:
+- echo `PWD`
+- ssh -tt ubuntu@39.106.168.39 < run.sh
