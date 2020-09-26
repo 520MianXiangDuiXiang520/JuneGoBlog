@@ -15,14 +15,14 @@ before_script:
 - echo "password=$Redis_Password" >> secret.ini
 script:
 - make build
-deploy:
-  provider: pages
-  skip_cleanup: true
-  keep_history: true
-  github_token: "$GitHub_Token"
-  target_branch: master
-  on:
-    branch: master
+#deploy:
+#  provider: pages
+#  skip_cleanup: true
+#  keep_history: true
+#  github_token: "$GitHub_Token"
+#  target_branch: master
+#  on:
+#    branch: master
 after_script: rm -rf secret.ini
 before_install:
 - echo $super_secret_password
