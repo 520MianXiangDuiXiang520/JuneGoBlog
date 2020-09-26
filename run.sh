@@ -1,3 +1,3 @@
-git pull
+#!/bin/bash
 make build
 ./bin/JuneGoBlog
