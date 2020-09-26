@@ -12,7 +12,7 @@ var AccessControlAllowOrigin []string = []string{
 	"http://localhost:8082",
 	"http://localhost:8083",
 	"http://localhost:8084",
-	"http://localhost:8085",
+	"http://localhost:8889",
 }
 
 func CorsHandler() gin.HandlerFunc {
