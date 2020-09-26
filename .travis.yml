@@ -14,7 +14,7 @@ before_script:
 - echo "port=$Redis_Port" >> secret.ini
 - echo "password=$Redis_Password" >> secret.ini
 script:
-- ls && make build && ls
+- make build
 deploy:
   provider: pages
   skip_cleanup: true
