@@ -25,3 +25,13 @@ deploy:
   on:
     branch: master
 after_script: rm -rf secret.ini
+before_install:
+- openssl aes-256-cbc -K $encrypted_9b2d7e19d83c_key -iv $encrypted_9b2d7e19d83c_iv
+  -in id_rsa.enc -out ~\/.ssh/id_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ~/.ssh/id_rsa
+- ssh-add ~/.ssh/id_rsa
+addons:
+    ssh_known_hosts: 39.106.168.39
+after_success:
+- ssh -tt root@39.106.169.39 < ls
