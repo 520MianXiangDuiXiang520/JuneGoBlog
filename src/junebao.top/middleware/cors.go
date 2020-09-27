@@ -3,6 +3,7 @@ package middleware
 import (
 	junebaotop "JuneGoBlog/src/junebao.top"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -10,14 +11,15 @@ import (
 var AccessControlAllowOrigin []string = []string{
 	"http://localhost:8081",
 	"http://localhost:8082",
-	"http://localhost:8083",
-	"http://localhost:8084",
+	"http://127.0.0.1:8889",
+	"http://localhost:8889",
 	"http://39.106.168.39:8889",
 }
 
 func CorsHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		origin := context.GetHeader("Origin")
+		log.Println(origin)
 		method := context.Request.Method
 		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		for _, allow := range AccessControlAllowOrigin {
