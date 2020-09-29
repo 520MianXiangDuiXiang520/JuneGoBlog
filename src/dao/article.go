@@ -504,8 +504,13 @@ func updateArticleWithCache(id int, article *Article) error {
 	}()
 	value := reflect.ValueOf(article).Elem()
 	for _, field := range fields {
+		var v interface{}
+		v = value.FieldByName(field)
+		if field == "CreateTime" {
+			v = article.CreateTime.Unix()
+		}
 		err := rc.Send("HSet", consts.ArticleInfoHashCache+strconv.Itoa(id),
-			field, value.FieldByName(field))
+			field, v)
 		if err != nil {
 			msg := fmt.Sprintf("send fail, id = %v, field = %v", id, field)
 			util.ExceptionLog(err, msg)
