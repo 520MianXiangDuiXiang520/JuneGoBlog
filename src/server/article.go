@@ -9,6 +9,7 @@ import (
 	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -147,7 +148,10 @@ func getAbstract(text string) string {
 	if len(abstractList) < 2 {
 		return text[:sp]
 	}
-	return abstractList[0]
+	// 避免标题加入摘要
+	r := regexp.MustCompile("^#(.|\\r|)+").ReplaceAllString(abstractList[0], "")
+	r = strings.Replace(r, "\n", "", len(r))
+	return r
 }
 
 func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
