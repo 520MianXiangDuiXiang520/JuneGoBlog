@@ -8,6 +8,7 @@ import (
 	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"strings"
 	"time"
 )
 
@@ -40,6 +41,9 @@ func TalkingAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.B
 		}
 	} else {
 		request.PTalkID = 0
+	}
+	if request.Username == "" {
+		request.Username = strings.Split(request.Email, "@")[0]
 	}
 	err := dao.AddTalk(&dao.Talks{
 		ArticleID:  request.ArticleID,
