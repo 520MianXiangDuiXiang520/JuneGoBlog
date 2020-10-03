@@ -13,3 +13,14 @@ func TestUpdateArticle(t *testing.T) {
 		AuthorID:   1,
 	})
 }
+
+func TestHasArticle(t *testing.T) {
+	unExist := 10000
+	exist := 29
+	if HasArticle(unExist) {
+		t.Error("Fail Test")
+	}
+	if !HasArticle(exist) {
+		t.Error("Fail Test")
+	}
+}

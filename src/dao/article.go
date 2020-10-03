@@ -492,9 +492,17 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 	return newArticle, err
 }
 
-// TODO: bitmap
+func hasArticleWithDB(id int) bool {
+	article := &Article{}
+	DB.Where("id = ?", id).First(article)
+	return article.ID != 0
+}
+
 func HasArticle(id int) bool {
-	return true
+	if src.Setting.Redis {
+		// TODO: bitmap
+	}
+	return hasArticleWithDB(id)
 }
 
 func updateArticleWithCache(id int, article *Article) error {
