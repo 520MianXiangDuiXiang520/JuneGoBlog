@@ -1,6 +1,7 @@
 package util
 
 import (
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -18,4 +19,13 @@ func TimeString2Time(str string) time.Time {
 	// Mon, 02 Jan 2006 15:04:05 MST"
 	t, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", str)
 	return t
+}
+
+func IsEmail(email string) bool {
+	if len(email) <= 0 {
+		return false
+	}
+	emailRules := `^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]+$`
+	ok, err := regexp.MatchString(emailRules, email)
+	return ok && err == nil
 }

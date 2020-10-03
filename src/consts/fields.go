@@ -29,3 +29,9 @@ const (
 )
 
 const CacheTagsSplitStr = "-"
+
+// 评论类型
+const (
+	RootTalkType  = 1
+	ChildTalkType = 2
+)

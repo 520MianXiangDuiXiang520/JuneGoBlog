@@ -15,6 +15,7 @@ before_script:
 - echo "password=$Redis_Password" >> secret.ini
 script:
 - make build
+- goveralls -service=travis-ci
 #deploy:
 #  provider: pages
 #  skip_cleanup: true

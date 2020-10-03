@@ -9,5 +9,6 @@ require (
 	github.com/jinzhu/gorm v1.9.15
 	github.com/mattn/goveralls v0.0.7 // indirect
 	github.com/satori/go.uuid v1.2.0
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/tools v0.0.0-20201002184944-ecd9fd270d5d // indirect
 )

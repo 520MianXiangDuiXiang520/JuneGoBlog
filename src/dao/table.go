@@ -1,6 +1,8 @@
 package dao
 
-import "time"
+import (
+	"time"
+)
 
 // 友链信息
 type FriendShipLink struct {
@@ -84,4 +86,26 @@ type ArticleTags struct {
 
 func (ArticleTags) TableName() string {
 	return "article_tags"
+}
+
+// 文章评论
+type Talks struct {
+	ID        int    `json:"id"gorm:"column:id"`
+	ArticleID int    `json:"articleID"gorm:"column:article_id"`
+	Text      string `json:"text"gorm:"column:text"`
+	// type == 1 表示是对文章的评论， type == 2 表示是跟评,
+	// 只有 type == 2 时，下面的 p_talk_id 才会生效
+	Type    int `json:"type"gorm:"column:type"`
+	PTalkID int `json:"pTalkID"gorm:"column:p_talk_id"`
+	// create_time 使用以秒计的时间戳
+	CreateTime int64 `json:"createTime"gorm:"column:create_time"`
+	// 以下是评论者信息
+	Email    string `json:"email"gorm:"column:email"`
+	HeadLink string `json:"headLink"gorm:"column:head_link"` // 可为空
+	Username string `json:"username"gorm:"column:username"`  // 可为空
+	SiteLink string `json:"siteLink"gorm:"column:site_link"` // 可为空
+}
+
+func (Talks) TableName() string {
+	return "talks"
 }
