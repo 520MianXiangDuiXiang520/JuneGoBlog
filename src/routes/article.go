@@ -22,14 +22,14 @@ func ArticleRegister(rg *gin.RouterGroup) {
 func articleTagsRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.ArticleTagsCheck,
-			server.ArticleTagsLogic, &message.ArticleTagsReq{}),
+			server.ArticleTagsLogic, message.ArticleTagsReq{}),
 	}
 }
 
 func articleDetailRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.ArticleDetailCheck,
-			server.ArticleDetailLogic, &message.ArticleDetailReq{}),
+			server.ArticleDetailLogic, message.ArticleDetailReq{}),
 	}
 }
 
