@@ -62,6 +62,9 @@ func queryArticleIDListFromCache(page, pageSize, total int) ([]int, error) {
 			return r, err
 		}
 
+		if result == nil {
+			return nil, errors.New("ReceiveNil")
+		}
 		re, _ := strconv.Atoi(string(result.([]byte)))
 		r = append(r, re)
 	}
@@ -206,14 +209,11 @@ func queryArticleInfoFromCache(id int) (ArticleListInfo, error) {
 **/
 func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]ArticleListInfo, error) {
 	result := make([]ArticleListInfo, 0)
-	// 获取 ArticleID List
-	// startTime := time.Now().UnixNano()
+
 	ids, err := queryArticleIDListFromCache(page, pageSize, total)
-	// step1Time := time.Now().UnixNano()
-	// log.Printf("查询文章ID List 用时：%v\n", (step1Time - startTime) / 1000000)
+
 	if err != nil {
-		log.Printf("从缓存中获取文章ID列表失败")
-		// 获取列表失败，开启携程重置数据
+		utils.LogPlus("从缓存中获取文章ID列表失败")
 		go func() {
 			iErr := InitArticleIDListCache()
 			if iErr != nil {
@@ -226,10 +226,7 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]ArticleListInf
 	for _, id := range ids {
 		var a ArticleListInfo
 		var e error
-		// step2 := time.Now().UnixNano()
 		a, e = queryArticleInfoFromCache(id)
-		// step3 := time.Now().UnixNano()
-		// log.Printf("queryArticleInfoFromCache 用时：%v\n", (step3 - step2) / 1000000)
 		if e != nil {
 			return nil, e
 		}
@@ -245,22 +242,19 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]ArticleListInf
 * Time: 2020/9/11 23:27
 **/
 func QueryArticleInfoByLimit(page, pageSize int) ([]ArticleListInfo, int, error) {
-	// startTime := time.Now().UnixNano()
 	total, err := QueryArticleTotal()
 	if err != nil {
 		return nil, 0, err
 	}
-	// step1Time := time.Now().UnixNano()
-	// log.Printf("查询文章总数用时：%v\n", (step1Time - startTime) / 1000000)
 	if src.Setting.Redis {
 		result, err := queryArticleInfoByLimitByCache(page, pageSize, total)
-		// step2Time := time.Now().UnixNano()
-		// log.Printf("查询文章列表用时：%v\n", (step2Time - step1Time) / 1000000)
 		if err == nil {
 			return result, total, err
 		}
+		utils.LogPlus("Fail to query from cache!!")
 	}
 
+	// 缓存中没有查到，从数据库中查
 	start := (page - 1) * pageSize
 	if total < start {
 		utils.LogPlus("total < start")
@@ -396,7 +390,19 @@ func QueryArticleDetail(id int) (Article, error) {
 func queryArticleTotalByCache() (int, error) {
 	rc := RedisPool.Get()
 	defer rc.Close()
-	return redis.Int(rc.Do("LLen", consts.ArticleIDListCache))
+	result, err := redis.Int(rc.Do("LLen", consts.ArticleIDListCache))
+	if err != nil {
+		msg := fmt.Sprintf("Fail to query articles total")
+		utils.ExceptionLog(err, msg)
+		return 0, err
+	}
+	if result == 0 {
+		msg := fmt.Sprintf("The total number of articles queried from the cache is 0")
+		err := errors.New("ResultIsZero")
+		utils.ExceptionLog(err, msg)
+		return 0, err
+	}
+	return result, nil
 }
 
 func queryArticleTotalByDB() (int, error) {

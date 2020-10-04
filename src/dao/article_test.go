@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"log"
 	"testing"
 	"time"
 )
@@ -23,4 +24,12 @@ func TestHasArticle(t *testing.T) {
 	if !HasArticle(exist) {
 		t.Error("Fail Test")
 	}
+}
+
+func TestQueryArticleIDListFromCache(t *testing.T) {
+	ids, err := queryArticleIDListFromCache(5, 11, 10)
+	if err != nil {
+		t.Error(err)
+	}
+	log.Println(ids)
 }
