@@ -60,7 +60,7 @@ class CodeTool:
 func %route%() []gin.HandlerFunc {
     return []gin.HandlerFunc{
         junebao_top.EasyHandler(check.%check%,
-            server.%server%, &message.%req%{}),
+            server.%server%, message.%req%{}),
     }
 }"""
         func = f_text(func, self)
@@ -101,9 +101,8 @@ type %resp% struct {
 type %req% struct {
 }
 
-func (r %req%) JSON(ctx *gin.Context,
-    jsonReq *junebao_top.BaseReqInter) error {
-    return ctx.ShouldBindJSON(&jsonReq)
+func (r %req%) JSON(ctx *gin.Context) error {
+    return ctx.ShouldBindJSON(&r)
 }"""
         func = f_text(func, self)
         with open(f"./src/message/{self.routes[1]}.go", "a+") as fp:
