@@ -36,7 +36,7 @@ func articleDetailRoutes() []gin.HandlerFunc {
 func articleListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.ArticleListCheck,
-			server.ArticleListLogic, &message.ArticleListReq{}),
+			server.ArticleListLogic, message.ArticleListReq{}),
 	}
 }
 
@@ -45,7 +45,7 @@ func articleAddRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.ArticleAddCheck,
-			server.ArticleAddLogic, &message.ArticleAddReq{}),
+			server.ArticleAddLogic, message.ArticleAddReq{}),
 	}
 }
 
@@ -54,7 +54,7 @@ func articleUpdateRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.ArticleUpdateCheck,
-			server.ArticleUpdateLogic, &message.ArticleUpdateReq{}),
+			server.ArticleUpdateLogic, message.ArticleUpdateReq{}),
 	}
 }
 
@@ -63,6 +63,6 @@ func articleDeleteRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.ArticleDeleteCheck,
-			server.ArticleDeleteLogic, &message.ArticleDeleteReq{}),
+			server.ArticleDeleteLogic, message.ArticleDeleteReq{}),
 	}
 }

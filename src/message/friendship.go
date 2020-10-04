@@ -56,27 +56,22 @@ type FriendUnShowListReq struct {
 // 获取申请中（未展示）的友链列表响应
 type FriendUnShowListResp = FriendShipListResp
 
-func (fau FriendUnShowListReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (fau *FriendUnShowListReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&fau)
 }
 
-func (far FriendApprovalReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (far *FriendApprovalReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&far)
 }
 
-func (flr FriendShipListReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (flr *FriendShipListReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&flr)
 }
 
-func (far FriendApplicationReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (far *FriendApplicationReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&far)
 }
 
-func (flr FriendDeleteReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (flr *FriendDeleteReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&flr)
 }

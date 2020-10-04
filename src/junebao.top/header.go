@@ -19,7 +19,7 @@ type BaseRespHeader struct {
 }
 
 type BaseReqInter interface {
-	JSON(ctx *gin.Context, jsonReq *BaseReqInter) error
+	JSON(ctx *gin.Context) error
 }
 
 type BaseRespInter = interface{}

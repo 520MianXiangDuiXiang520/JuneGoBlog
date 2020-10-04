@@ -19,7 +19,7 @@ func AuthRegister(rg *gin.RouterGroup) {
 func authLoginRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.AuthLoginCheck,
-			server.AuthLoginLogic, &message.AuthLoginReq{}),
+			server.AuthLoginLogic, message.AuthLoginReq{}),
 	}
 }
 
@@ -27,7 +27,7 @@ func authInfoRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		middleware.Auth(middleware2.TokenAuth),
 		junebao_top.EasyHandler(check.AuthInfoCheck,
-			server.AuthInfoLogic, &message.AuthInfoReq{}),
+			server.AuthInfoLogic, message.AuthInfoReq{}),
 	}
 }
 
@@ -35,6 +35,6 @@ func authLogoutRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		middleware.Auth(middleware2.TokenAuth),
 		junebao_top.EasyHandler(check.AuthLogoutCheck,
-			server.AuthLogoutLogic, &message.AuthLogoutReq{}),
+			server.AuthLogoutLogic, message.AuthLogoutReq{}),
 	}
 }

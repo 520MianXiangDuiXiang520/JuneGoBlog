@@ -18,13 +18,13 @@ func TalkingRegister(rg *gin.RouterGroup) {
 func talkingListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.TalkingListCheck,
-			server.TalkingListLogic, &message.TalkingListReq{}),
+			server.TalkingListLogic, message.TalkingListReq{}),
 	}
 }
 
 func talkingAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.TalkingAddCheck,
-			server.TalkingAddLogic, &message.TalkingAddReq{}),
+			server.TalkingAddLogic, message.TalkingAddReq{}),
 	}
 }

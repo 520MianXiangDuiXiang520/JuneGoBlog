@@ -39,19 +39,16 @@ type ArticleDetailResp struct {
 	Text string `json:"text"`
 }
 
-func (atr ArticleTagsReq) JSON(ctx *gin.Context,
-	jsonReq *junebaotop.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (atr *ArticleTagsReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&atr)
 }
 
-func (flr ArticleListReq) JSON(ctx *gin.Context,
-	jsonReq *junebaotop.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (flr *ArticleListReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&flr)
 }
 
-func (adr ArticleDetailReq) JSON(ctx *gin.Context,
-	jsonReq *junebaotop.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (adr *ArticleDetailReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&adr)
 }
 
 type ArticleAddResp struct {
@@ -63,9 +60,8 @@ type ArticleAddReq struct {
 	Tags []int `json:"tags"`
 }
 
-func (r ArticleAddReq) JSON(ctx *gin.Context,
-	jsonReq *junebaotop.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *ArticleAddReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }
 
 type ArticleUpdateResp struct {
@@ -77,9 +73,8 @@ type ArticleUpdateReq struct {
 	Tags []int `json:"tags"`
 }
 
-func (r ArticleUpdateReq) JSON(ctx *gin.Context,
-	jsonReq *junebaotop.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *ArticleUpdateReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }
 
 type ArticleDeleteResp struct {
@@ -90,7 +85,6 @@ type ArticleDeleteReq struct {
 	ID int `json:"id"`
 }
 
-func (r ArticleDeleteReq) JSON(ctx *gin.Context,
-	jsonReq *junebaotop.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *ArticleDeleteReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }

@@ -15,9 +15,8 @@ type AuthLoginReq struct {
 	Password string `json:"password"`
 }
 
-func (r AuthLoginReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *AuthLoginReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }
 
 type AuthInfoResp struct {
@@ -30,9 +29,8 @@ type AuthInfoResp struct {
 type AuthInfoReq struct {
 }
 
-func (r AuthInfoReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *AuthInfoReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }
 
 type AuthLogoutResp struct {
@@ -42,7 +40,6 @@ type AuthLogoutResp struct {
 type AuthLogoutReq struct {
 }
 
-func (r AuthLogoutReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *AuthLogoutReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }

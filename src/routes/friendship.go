@@ -23,7 +23,7 @@ func friendshipUnShowRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.FriendShipUnShowListCheck,
-			server.FriendUnShowListLogic, &message.FriendUnShowListReq{}),
+			server.FriendUnShowListLogic, message.FriendUnShowListReq{}),
 	}
 }
 
@@ -32,7 +32,7 @@ func friendApprovalRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.FriendApprovalCheck,
-			server.FriendApprovalLogic, &message.FriendApprovalReq{}),
+			server.FriendApprovalLogic, message.FriendApprovalReq{}),
 	}
 }
 
@@ -41,20 +41,20 @@ func friendDeleteRoutes() []gin.HandlerFunc {
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
 		junebao_top.EasyHandler(check.FriendDeleteCheck,
-			server.FriendDeleteLogic, &message.FriendDeleteReq{}),
+			server.FriendDeleteLogic, message.FriendDeleteReq{}),
 	}
 }
 
 func friendApplicationRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.FriendApplicationCheck,
-			server.FriendApplicationLogic, &message.FriendApplicationReq{}),
+			server.FriendApplicationLogic, message.FriendApplicationReq{}),
 	}
 }
 
 func friendListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		junebao_top.EasyHandler(check.FriendShipListCheck,
-			server.FriendShipListLogic, &message.FriendShipListReq{}),
+			server.FriendShipListLogic, message.FriendShipListReq{}),
 	}
 }

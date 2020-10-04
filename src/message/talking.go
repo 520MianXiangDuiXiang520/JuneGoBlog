@@ -19,9 +19,8 @@ type TalkingListReq struct {
 	ParentTalkID int `json:"parentTalkID"` // 父评论 ID（非必须）
 }
 
-func (r TalkingListReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *TalkingListReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }
 
 type TalkingAddResp struct {
@@ -38,7 +37,6 @@ type TalkingAddReq struct {
 	SiteLink  string `json:"siteLink"`
 }
 
-func (r TalkingAddReq) JSON(ctx *gin.Context,
-	jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (r *TalkingAddReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&r)
 }

@@ -8,8 +8,8 @@ import (
 // api/tag/list 请求格式
 type TagListReq struct{}
 
-func (tlq TagListReq) JSON(ctx *gin.Context, jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (tlq *TagListReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&tlq)
 }
 
 // 标签信息
@@ -31,8 +31,8 @@ type TagAddReq struct {
 	TagName string `form:"name" json:"name"` // 标签名
 }
 
-func (taq TagAddReq) JSON(ctx *gin.Context, jsonReq *junebao_top.BaseReqInter) error {
-	return ctx.ShouldBindJSON(&jsonReq)
+func (taq *TagAddReq) JSON(ctx *gin.Context) error {
+	return ctx.ShouldBindJSON(&taq)
 }
 
 type TagAddResp struct {

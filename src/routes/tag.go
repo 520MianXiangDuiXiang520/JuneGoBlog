@@ -28,12 +28,12 @@ func tagAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		middleware.Auth(middleware2.TokenAuth),
 		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.TagAddCheck, server.TagAddLogin, &message.TagAddReq{}),
+		junebao_top.EasyHandler(check.TagAddCheck, server.TagAddLogin, message.TagAddReq{}),
 	}
 }
 
 func tagListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.TagListCheck, server.TagListLogin, &message.TagListReq{}),
+		junebao_top.EasyHandler(check.TagListCheck, server.TagListLogin, message.TagListReq{}),
 	}
 }
