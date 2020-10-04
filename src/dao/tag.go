@@ -3,7 +3,7 @@ package dao
 import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/util"
+	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -31,7 +31,7 @@ func addTagFromDB(name string) (*Tag, error) {
 		if err != nil {
 			tx.Rollback()
 			msg := fmt.Sprintf("Fail to add tag with DB, tag name = %v", name)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 		}
 		tx.Commit()
 	}()
@@ -49,14 +49,14 @@ func addTagFromCache(tag *Tag) error {
 	_, err = rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "ID", tag.ID)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to Send TagsInfoHashCache:%v field = %v", tag.ID, "ID")
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 
 	_, err = rc.Do("HSET", consts.TagsInfoHashCache+strconv.Itoa(tag.ID), "Name", tag.Name)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to Send TagsInfoHashCache:%v field = %v", tag.ID, "Name")
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 
@@ -64,7 +64,7 @@ func addTagFromCache(tag *Tag) error {
 		"CreateTime", tag.CreateTime.Unix())
 	if err != nil {
 		msg := fmt.Sprintf("Fail to Send TagsInfoHashCache:%v field = %v", tag.ID, "CreateTime")
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 
@@ -97,12 +97,12 @@ func insertTagToCache(tag *Tag) error {
 			field, value.FieldByName(field).String())
 		if err != nil {
 			msg := fmt.Sprintf("send fail when insert tag to cache, tagID = %v, field = %v", tag.ID, field)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return err
 		}
 	}
 	err := rc.Flush()
-	util.ExceptionLog(err, "flush fail when insert tag to cache")
+	utils.ExceptionLog(err, "flush fail when insert tag to cache")
 	return err
 }
 
@@ -123,16 +123,16 @@ func queryTagByIDFromCache(id int) (*Tag, error) {
 		err := rc.Send("HGET", consts.TagsInfoHashCache+strconv.Itoa(id), field)
 		if err != nil {
 			msg := fmt.Sprintf("Fail to query tag info from cache, tagID = %v, field = %v", id, field)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return nil, err
 		}
 	}
-	util.ExceptionLog(rc.Flush(), "Fail to flush query tag info")
+	utils.ExceptionLog(rc.Flush(), "Fail to flush query tag info")
 	for i, field := range tagInfoCacheFields {
 		result, err := rc.Receive()
 		if err != nil {
 			msg := fmt.Sprintf("Fail to do rc.Receive(), tagID = %v, field = %v", id, field)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return nil, err
 		}
 		if result != nil {
@@ -140,11 +140,11 @@ func queryTagByIDFromCache(id int) (*Tag, error) {
 		} else {
 			// 缓存失效
 			msg := fmt.Sprintf("缓存未命中！tagID = %v, field = %v", id, field)
-			util.LogPlus(msg)
+			utils.LogPlus(msg)
 			tagFromDB, err := queryTagByIDFromDB(id)
 			if err != nil {
 				msg := fmt.Sprintf("Fail to query tag from DB when cache miss, tagID = %v", id)
-				util.ExceptionLog(err, msg)
+				utils.ExceptionLog(err, msg)
 				return nil, err
 			}
 			err = insertTagToCache(tagFromDB)

@@ -4,8 +4,8 @@ import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
+	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
-	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
@@ -18,7 +18,7 @@ func TalkingListLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.
 	talks, err := dao.QueryTalksByArticleIDLimit(request.ArticleID, request.Page, request.PageSize)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to query talks, request is %v ", request)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 	}
 	resp.HasNext = true
 	if len(talks) < request.PageSize {
@@ -57,7 +57,7 @@ func TalkingAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.B
 	})
 	if err != nil {
 		msg := fmt.Sprintf("Fail to add new talk, request = %v", request)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return junebaotop.SystemErrorRespHeader
 	}
 	resp.Header = junebaotop.SuccessRespHeader

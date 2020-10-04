@@ -3,6 +3,7 @@ package server
 import (
 	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
+	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
 	"JuneGoBlog/src/util"
 	"fmt"
@@ -24,7 +25,7 @@ func AuthLoginLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.Ba
 	err := dao.InsertUserToken(user, token, time.Now().Add(expire))
 	if err != nil {
 		msg := fmt.Sprintf("insert userToken fail, user id = %v, token = %v\n", user.ID, token)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return junebaotop.SystemErrorRespHeader
 	}
 	resp.Token = token
@@ -56,7 +57,7 @@ func AuthLogoutLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.B
 	err := dao.DeleteUserTokenByUID(user.ID)
 	if err != nil {
 		msg := fmt.Sprintf("logout fail(delete user token fail), uid = %v", user.ID)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return junebaotop.SystemErrorRespHeader
 	}
 	resp.Header = junebaotop.SuccessRespHeader

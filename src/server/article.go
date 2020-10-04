@@ -5,8 +5,8 @@ import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
+	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
-	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"regexp"
@@ -19,7 +19,7 @@ func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
 	tagsInfoList := make([]message.TagInfo, 0)
 	if err := dao.QueryAllTagsByArticleID(id, &tags); err != nil {
 		msg := fmt.Sprintf("get all tags by article id fail, %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return tagsInfoList, err
 	}
 
@@ -27,7 +27,7 @@ func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
 		articleTotal, err := dao.QueryArticleTotalByTagID(tagInfo.ID)
 		if err != nil {
 			mes := fmt.Sprintf("query article total by cache fail !")
-			util.ExceptionLog(err, mes)
+			utils.ExceptionLog(err, mes)
 			return nil, err
 		}
 		tagsInfoList = append(tagsInfoList, message.TagInfo{
@@ -48,7 +48,7 @@ func ArticleTagsLogic(ctx *gin.Context,
 	if err != nil {
 		mes := fmt.Sprintf("get article tags fail, "+
 			"article id = %v ", reqL.ArticleID)
-		util.ExceptionLog(err, mes)
+		utils.ExceptionLog(err, mes)
 		return junebaotop.SystemErrorRespHeader
 	}
 	resp.ID = reqL.ArticleID

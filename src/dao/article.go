@@ -3,7 +3,7 @@ package dao
 import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/util"
+	"JuneGoBlog/src/junebao.top/utils"
 	"errors"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
@@ -98,7 +98,7 @@ func setNewArticleInfoToCache(id int, article *ArticleListInfo) error {
 		"Tags", strings.Join(tagIDs, consts.CacheTagsSplitStr))
 	if err != nil {
 		msg := fmt.Sprintf("Failed to insert tag information into cache, tags = %v, articleID = %v", tagIDs, id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
@@ -144,15 +144,15 @@ func queryArticleInfoFromCache(id int) (ArticleListInfo, error) {
 		err := rc.Send("Hget", consts.ArticleInfoHashCache+strconv.Itoa(id), field)
 		if err != nil {
 			msg := fmt.Sprintf("Hget article info from redis fail, article id = %v, field = %v", id, field)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 		}
 	}
-	util.ExceptionLog(rc.Flush(), "redis flush fail")
+	utils.ExceptionLog(rc.Flush(), "redis flush fail")
 	for _, field := range fields {
 		r, err := rc.Receive()
 		if err != nil {
 			msg := fmt.Sprintf("do rc.Receive fail, article id = %v", id)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return result, err
 		}
 		// 缓存未命中
@@ -218,7 +218,7 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]ArticleListInf
 			iErr := InitArticleIDListCache()
 			if iErr != nil {
 				msg := fmt.Sprintf("Failed to update the article ID in the cache asynchronously")
-				util.ExceptionLog(iErr, msg)
+				utils.ExceptionLog(iErr, msg)
 			}
 		}()
 		return nil, err
@@ -263,7 +263,7 @@ func QueryArticleInfoByLimit(page, pageSize int) ([]ArticleListInfo, int, error)
 
 	start := (page - 1) * pageSize
 	if total < start {
-		util.LogPlus("total < start")
+		utils.LogPlus("total < start")
 		return nil, 0, errors.New("total < start")
 	}
 	newPageSize := total - start
@@ -282,7 +282,7 @@ func QueryArticleInfoByLimit(page, pageSize int) ([]ArticleListInfo, int, error)
 		err := QueryAllTagsByArticleID(article.ID, &tags)
 		if err != nil {
 			msg := fmt.Sprintf("get article tags fail, article id = %v", article.ID)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 		}
 		articleListInfos[i] = ArticleListInfo{
 			Tags:       tags,
@@ -311,7 +311,7 @@ func QueryArticleInfoByLimitWithTag(tagID, page, pageSize int) ([]ArticleListInf
 	start := (page - 1) * pageSize
 	log.Printf("total = %v, pageSize = %v", total, pageSize)
 	if total < start {
-		util.LogPlus("total < start")
+		utils.LogPlus("total < start")
 		return nil, 0, errors.New("total < start")
 	}
 	newPageSize := total - start
@@ -351,14 +351,14 @@ func QueryArticleListInfoByIDWithDB(id int) (ArticleListInfo, error) {
 		" author_id, create_time").Where("id = ?", id).First(&article).Error
 	if err != nil {
 		msg := fmt.Sprintf("query article by id fail, article id = %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return result, err
 	}
 	tags := make([]Tag, 0)
 	err = QueryAllTagsByArticleID(id, &tags)
 	if err != nil {
 		msg := fmt.Sprintf("query all tags by articleID fail, articleID = %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return result, err
 	}
 	result = ArticleListInfo{
@@ -429,7 +429,7 @@ func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	re, err := rp.Do("LPUSH", consts.ArticleIDListCache, newArticle.ID)
 	if err != nil {
 		msg := fmt.Sprintf("update %v fail, article id = %v", consts.ArticleIDListCache, newArticle.ID)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 
@@ -444,7 +444,7 @@ func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	})
 	if err != nil {
 		msg := fmt.Sprintf("update %v fail, article id = %v", "article info", newArticle.ID)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 	}
 	return err
 }
@@ -455,7 +455,7 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("insert new article fail, title = %v", newArticle.Title)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -471,7 +471,7 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 		if tag == nil {
 			msg := fmt.Sprintf("Get nil when query tag, tagID = %v", tagID)
 			err := errors.New("return nil")
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return nil, err
 		}
 		tags[i] = *tag
@@ -482,7 +482,7 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 		if err != nil {
 			msg := fmt.Sprintf("fail to insert new article tag;"+
 				" articleID = %v, tagID = %v", newArticle.ID, tagID)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return nil, err
 		}
 	}
@@ -521,14 +521,14 @@ func updateArticleWithCache(id int, article *Article) error {
 			field, v)
 		if err != nil {
 			msg := fmt.Sprintf("send fail, id = %v, field = %v", id, field)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return err
 		}
 	}
 	err := rc.Flush()
 	if err != nil {
 		msg := fmt.Sprintf("flush fail, id = %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
@@ -540,7 +540,7 @@ func UpdateArticle(id int, article *Article) error {
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("update article fail, id = %v, title = %v", id, article.Title)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -548,14 +548,14 @@ func UpdateArticle(id int, article *Article) error {
 	err = tx.Model(&Article{}).Where("id = ?", id).Updates(article).Error
 	if err != nil {
 		msg := fmt.Sprintf("Fail to update article table, articleID = %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 	if src.Setting.Redis {
 		err = updateArticleWithCache(id, article)
 		if err != nil {
 			msg := fmt.Sprintf("Fail to update article cache, articleID = %v", id)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			return err
 		}
 	}
@@ -569,7 +569,7 @@ func deleteArticleFromDB(id int) error {
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("Fail to delete article from db, article id = %v", id)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -588,7 +588,7 @@ func deleteArticleIDListCacheByID(id int) error {
 	_, err := rc.Do("LREM", consts.ArticleIDListCache, 0, id)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to delete ArticleIDListCache by id, id = %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
@@ -601,7 +601,7 @@ func deleteArticleInfoHashCacheByID(id int) error {
 	_, err := rc.Do("DEL", consts.ArticleInfoHashCache+strconv.Itoa(id))
 	if err != nil {
 		msg := fmt.Sprintf("Fail to delete ArticleInfoHashCache by id, id = %v", id)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return err
 	}
 	return nil

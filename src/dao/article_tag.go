@@ -3,7 +3,7 @@ package dao
 import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/util"
+	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -27,7 +27,7 @@ func InsertArticleTag(at *ArticleTags) error {
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("insert  articleTag fail, article id = %v, tag id = %v,", at.ArticleID, at.TagID)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -71,7 +71,7 @@ func hasTagsChanged(articleID int, tags []*Tag) bool {
 	err := QueryAllTagsByArticleID(articleID, &history)
 	if err != nil {
 		msg := fmt.Sprintf("query all tags by article id fail, article id = %v", articleID)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return true
 	}
 	if len(history) != len(tags) {
@@ -98,7 +98,7 @@ func DeleteArticleTags(articleID int) error {
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("delete articleTag fail, article id = %v", articleID)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -118,7 +118,7 @@ func updateArticleTagsToCache(articleID int, tags []*Tag) error {
 		"Tags", strings.Join(tIDs, consts.CacheTagsSplitStr))
 	if err != nil {
 		msg := fmt.Sprintf("do hset fail when update article tags, tIDs = %v", tIDs)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 	}
 	return err
 }
@@ -169,7 +169,7 @@ func QueryAllArticleByTagID(tagID int) ([]ArticleTags, error) {
 
 	if err != nil {
 		msg := fmt.Sprintf("Query All Article By TagID fail, tagid = %v", tagID)
-		util.ExceptionLog(err, msg)
+		utils.ExceptionLog(err, msg)
 		return nil, err
 	}
 	return result, err

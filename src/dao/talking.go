@@ -2,7 +2,7 @@ package dao
 
 import (
 	"JuneGoBlog/src"
-	"JuneGoBlog/src/util"
+	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
 )
 
@@ -26,7 +26,7 @@ func addTalkWithDB(talk *Talks) error {
 		if err != nil {
 			tx.Rollback()
 			msg := fmt.Sprintf("Failed to add comment, rolled back, talk = %v", talk)
-			util.ExceptionLog(err, msg)
+			utils.ExceptionLog(err, msg)
 		}
 		tx.Commit()
 	}()
