@@ -303,7 +303,6 @@ func QueryArticleInfoByLimitWithTag(tagID, page, pageSize int) ([]ArticleListInf
 
 	total := len(aIDs)
 	start := (page - 1) * pageSize
-	log.Printf("total = %v, pageSize = %v", total, pageSize)
 	if total < start {
 		utils.LogPlus("total < start")
 		return nil, 0, errors.New("total < start")
@@ -318,7 +317,6 @@ func QueryArticleInfoByLimitWithTag(tagID, page, pageSize int) ([]ArticleListInf
 	if total > pageSize {
 		aIDs = aIDs[start : start+pageSize]
 	}
-
 	for _, a := range aIDs {
 		article, err := QueryArticleByID(a.ArticleID)
 		if err != nil {
