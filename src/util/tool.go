@@ -25,7 +25,7 @@ func IsEmail(email string) bool {
 	if len(email) <= 0 {
 		return false
 	}
-	emailRules := `^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]+$`
+	emailRules := `^[A-Za-z0-9\u4e00-\u9fa5_.]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$`
 	ok, err := regexp.MatchString(emailRules, email)
 	return ok && err == nil
 }
