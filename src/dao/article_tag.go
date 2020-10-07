@@ -5,6 +5,7 @@ import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -78,14 +79,14 @@ func hasTagsChanged(articleID int, tags []*Tag) bool {
 		return true
 	}
 	for _, tag := range tags {
-		index := 0
-		for i, his := range history {
+		get := false
+		for _, his := range history {
 			if tag.ID == his.ID {
+				get = true
 				break
 			}
-			index = i
 		}
-		if index == len(history)-1 {
+		if !get {
 			return true
 		}
 	}
@@ -103,7 +104,7 @@ func DeleteArticleTags(articleID int) error {
 		}
 		tx.Commit()
 	}()
-	err = tx.Where("id = ?", articleID).Delete(&ArticleTags{}).Error
+	err = tx.Where("article_id = ?", articleID).Delete(&ArticleTags{}).Error
 	return err
 }
 
@@ -126,6 +127,7 @@ func updateArticleTagsToCache(articleID int, tags []*Tag) error {
 func UpdateArticleTags(articleID int, tags []*Tag) error {
 	// 如果 Tag 没有发生改变就不做修改
 	if !hasTagsChanged(articleID, tags) {
+		log.Printf("tag no change \n")
 		return nil
 	}
 	var err error
