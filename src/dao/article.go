@@ -13,10 +13,6 @@ import (
 	"strings"
 )
 
-var fields = []string{
-	"Title", "Abstract", "ID", "AuthorID", "CreateTime", "Tags",
-}
-
 /**
 * WiKi: 通过缓存中文章ID列表的下标得到文章ID
 * Author: JuneBao
@@ -136,6 +132,9 @@ func articleInfoMissHitsUpdate(id int) (ArticleListInfo, error) {
 * Time: 2020/8/22 16:14
 **/
 func queryArticleInfoFromCache(id int) (ArticleListInfo, error) {
+	var fields = []string{
+		"Title", "Abstract", "ID", "CreateTime", "Tags",
+	}
 	result := ArticleListInfo{}
 	articleFields := make([]string, 0)
 	rc := RedisPool.Get()
@@ -180,8 +179,8 @@ func queryArticleInfoFromCache(id int) (ArticleListInfo, error) {
 	}
 	if len(articleFields) >= len(fields) {
 		id, _ := strconv.Atoi(articleFields[2])
-		cTime, _ := strconv.Atoi(articleFields[4])
-		tagIDs := strings.Split(articleFields[5], "-")
+		cTime, _ := strconv.Atoi(articleFields[3])
+		tagIDs := strings.Split(articleFields[4], "-")
 		if queryTagFlag {
 			for _, tagID := range tagIDs {
 				tid, _ := strconv.Atoi(tagID)
