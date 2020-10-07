@@ -514,22 +514,17 @@ func updateArticleWithCache(id int, article *Article) error {
 	defer func() {
 		rc.Close()
 	}()
-	value := reflect.ValueOf(article).Elem()
-	for _, field := range fields {
-		var v interface{}
-		v = value.FieldByName(field)
-		if field == "CreateTime" {
-			v = article.CreateTime.Unix()
-		}
-		err := rc.Send("HSet", consts.ArticleInfoHashCache+strconv.Itoa(id),
-			field, v)
-		if err != nil {
-			msg := fmt.Sprintf("send fail, id = %v, field = %v", id, field)
-			utils.ExceptionLog(err, msg)
-			return err
-		}
+	var err error
+	err = rc.Send("HSet", consts.ArticleInfoHashCache+strconv.Itoa(id),
+		"Title", article.Title)
+	err = rc.Send("HSet", consts.ArticleInfoHashCache+strconv.Itoa(id),
+		"Abstract", article.Abstract)
+	if err != nil {
+		msg := fmt.Sprintf("Fail to send new value with cache when update article, article = %v", article)
+		utils.ExceptionLog(err, msg)
+		return err
 	}
-	err := rc.Flush()
+	err = rc.Flush()
 	if err != nil {
 		msg := fmt.Sprintf("flush fail, id = %v", id)
 		utils.ExceptionLog(err, msg)
@@ -549,7 +544,8 @@ func UpdateArticle(id int, article *Article) error {
 		}
 		tx.Commit()
 	}()
-	err = tx.Model(&Article{}).Where("id = ?", id).Updates(article).Error
+	// 更新文章不更新创建时间
+	err = tx.Model(&Article{}).Omit("create_time").Where("id = ?", id).Updates(article).Error
 	if err != nil {
 		msg := fmt.Sprintf("Fail to update article table, articleID = %v", id)
 		utils.ExceptionLog(err, msg)

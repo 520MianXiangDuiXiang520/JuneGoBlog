@@ -164,9 +164,9 @@ func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaoto
 	}
 	author := user.(*dao.User)
 
-	if request.CreateTime.Unix() < 0 {
-		request.CreateTime = time.Now()
-	}
+	// if request.CreateTime.Unix() < 0 {
+	// 	request.CreateTime = time.Now()
+	// }
 
 	abstract := request.Abstract
 	if abstract == "" {
@@ -175,12 +175,12 @@ func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaoto
 
 	// update article table
 	err := dao.UpdateArticle(request.ID, &dao.Article{
-		ID:         request.ID,
-		Text:       request.Text,
-		Title:      request.Title,
-		AuthorID:   author.ID,
-		Abstract:   abstract,
-		CreateTime: request.CreateTime,
+		ID:       request.ID,
+		Text:     request.Text,
+		Title:    request.Title,
+		AuthorID: author.ID,
+		Abstract: abstract,
+		// CreateTime: request.CreateTime,
 	})
 	if err != nil {
 		return junebaotop.SystemErrorRespHeader
