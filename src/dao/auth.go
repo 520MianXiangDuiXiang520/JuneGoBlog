@@ -1,6 +1,9 @@
 package dao
 
 import (
+	"JuneGoBlog/src/consts"
+	"JuneGoBlog/src/junebao.top/utils"
+	"fmt"
 	"time"
 )
 
@@ -25,6 +28,13 @@ func GetUserByToken(token string) (*User, bool) {
 	if ut.ExpireTime.Unix() < time.Now().Unix() {
 		err = DeleteUserTokenByID(ut.ID)
 		return nil, false
+	}
+	// 快过期时更新 Token
+	if ut.ExpireTime.Unix()-time.Now().Unix() < consts.TenMinutes {
+		err = UpdateTokenExpireTime(ut.ID)
+		if err != nil {
+			return nil, false
+		}
 	}
 	err = DB.Where("id = ?", ut.UserID).First(&user).Error
 	return &user, err == nil
@@ -54,6 +64,22 @@ func DeleteUserTokenByID(id int) error {
 	}()
 	err = tx.Where("id = ?", id).Delete(&UserToken{}).Error
 	return err
+}
+
+func UpdateTokenExpireTime(id int) error {
+	tx := DB.Begin()
+	var err error
+	defer func() {
+		if err != nil {
+			msg := fmt.Sprintf("Fail to update token expire time, token id = %v", id)
+			utils.ExceptionLog(err, msg)
+			tx.Rollback()
+		}
+		tx.Commit()
+	}()
+	return tx.Model(&UserToken{}).Select("expire_time").Updates(map[string]interface{}{
+		"expire_time": consts.TokenExpireTime,
+	}).Error
 }
 
 func InsertUserToken(user *User, token string, expire time.Time) error {

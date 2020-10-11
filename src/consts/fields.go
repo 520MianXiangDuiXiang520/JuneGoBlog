@@ -1,5 +1,9 @@
 package consts
 
+import (
+	"time"
+)
+
 // redis Key
 const (
 	ArticleIDListCache   = "JuneGo:ArticleIDList" // 文章ID列表
@@ -37,3 +41,13 @@ const (
 )
 
 const MaxArticleTitleLen = 100
+
+const TokenKeepExpireTime = "30m"
+const (
+	TenMinutes = 60 * 10
+	HalfAnHour = 60 * 30
+)
+
+// Token 过期时间
+var expire, _ = time.ParseDuration(TokenKeepExpireTime)
+var TokenExpireTime = time.Now().Add(expire)
