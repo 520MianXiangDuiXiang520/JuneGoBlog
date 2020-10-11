@@ -35,3 +35,5 @@ const (
 	RootTalkType  = 1
 	ChildTalkType = 2
 )
+
+const MaxArticleTitleLen = 100

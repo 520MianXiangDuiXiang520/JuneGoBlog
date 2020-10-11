@@ -1,6 +1,7 @@
 package check
 
 import (
+	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
@@ -40,9 +41,15 @@ func ArticleTagsCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop
 
 func ArticleAddCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
 	request := req.(*message.ArticleAddReq)
+	errResp := message.ArticleAddResp{
+		Header: junebaotop.ParamErrorRespHeader,
+	}
 	if len(request.Title) == 0 || len(request.Text) == 0 ||
 		len(request.Tags) == 0 {
-		return junebaotop.ParamErrorRespHeader, errors.New("")
+		return errResp, errors.New("")
+	}
+	if len(request.Title) > consts.MaxArticleTitleLen {
+		return errResp, errors.New("TitleTooLong")
 	}
 	return http.StatusOK, nil
 }

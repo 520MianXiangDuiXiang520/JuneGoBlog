@@ -464,6 +464,9 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 		tx.Commit()
 	}()
 	err = tx.Create(newArticle).Error
+	if err != nil {
+		return nil, err
+	}
 	// 更新 article_tag 表
 	tags := make([]Tag, len(tagIDs))
 	for i, tagID := range tagIDs {

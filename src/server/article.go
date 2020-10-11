@@ -116,7 +116,8 @@ func ArticleAddLogic(ctx *gin.Context,
 	resp := message.ArticleAddResp{}
 	user, ok := ctx.Get("user")
 	if !ok {
-		return junebaotop.UnauthorizedRespHeader
+		resp.Header = junebaotop.UnauthorizedRespHeader
+		return resp
 	}
 	author := user.(*dao.User)
 
@@ -133,7 +134,8 @@ func ArticleAddLogic(ctx *gin.Context,
 	}
 	_, err := dao.AddArticle(&newArticle, request.Tags)
 	if err != nil {
-		return junebaotop.SystemErrorRespHeader
+		resp.Header = junebaotop.SystemErrorRespHeader
+		return resp
 	}
 	resp.Header = junebaotop.SuccessRespHeader
 	return resp
