@@ -478,10 +478,11 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 			return nil, err
 		}
 		tags[i] = *tag
-		err = InsertArticleTag(&ArticleTags{
+		// 不管什么地方发生错误，立刻回滚
+		err = tx.Create(&ArticleTags{
 			ArticleID: newArticle.ID,
 			TagID:     tagID,
-		})
+		}).Error
 		if err != nil {
 			msg := fmt.Sprintf("fail to insert new article tag;"+
 				" articleID = %v, tagID = %v", newArticle.ID, tagID)

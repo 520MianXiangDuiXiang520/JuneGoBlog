@@ -146,12 +146,12 @@ func getAbstract(text string) string {
 		sp = len(text)
 	}
 	if len(abstractList) < 2 {
-		return text[:sp]
+		return text[:sp-3] + "..."
 	}
 	// 避免标题加入摘要
 	r := regexp.MustCompile("^#(.|\\r|)+").ReplaceAllString(abstractList[0], "")
 	r = strings.Replace(r, "\n", "", len(r))
-	return r
+	return r[:sp-3] + "..."
 }
 
 func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
