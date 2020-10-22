@@ -66,9 +66,8 @@ func DeleteUserTokenByID(id int) error {
 	return err
 }
 
-func UpdateTokenExpireTime(id int) error {
+func UpdateTokenExpireTime(id int) (err error) {
 	tx := DB.Begin()
-	var err error
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("Fail to update token expire time, token id = %v", id)
