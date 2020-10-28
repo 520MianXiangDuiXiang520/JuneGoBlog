@@ -144,16 +144,20 @@ func ArticleAddLogic(ctx *gin.Context,
 func getAbstract(text string) string {
 	abstractList := strings.Split(text, consts.AbstractSplitStr)
 	sp := src.Setting.AbstractLen
-	if sp > len(text) {
-		sp = len(text)
-	}
 	if len(abstractList) < 2 {
-		return text[:sp-3] + "..."
+		if len(text) > sp {
+			return text[:sp-3] + "..."
+		}
+		return text
 	}
+
 	// 避免标题加入摘要
 	r := regexp.MustCompile("^#(.|\\r|)+").ReplaceAllString(abstractList[0], "")
 	r = strings.Replace(r, "\n", "", len(r))
-	return r[:sp-3] + "..."
+	if len(r) > sp {
+		return r[:sp-3] + "..."
+	}
+	return r
 }
 
 func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
