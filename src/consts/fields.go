@@ -49,5 +49,4 @@ const (
 )
 
 // Token 过期时间
-var expire, _ = time.ParseDuration(TokenKeepExpireTime)
-var TokenExpireTime = time.Now().Add(expire)
+var ExpireDuration, _ = time.ParseDuration(TokenKeepExpireTime)

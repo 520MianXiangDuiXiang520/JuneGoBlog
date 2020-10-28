@@ -9,6 +9,7 @@ import (
 	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 func AuthLoginLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
@@ -21,7 +22,7 @@ func AuthLoginLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.Ba
 		return junebaotop.UnauthorizedRespHeader
 	}
 	token := util.GetHashWithTimeUUID(user.Username + user.Password)
-	err := dao.InsertUserToken(user, token, consts.TokenExpireTime)
+	err := dao.InsertUserToken(user, token, time.Now().Add(consts.ExpireDuration))
 	if err != nil {
 		msg := fmt.Sprintf("insert userToken fail, user id = %v, token = %v\n", user.ID, token)
 		utils.ExceptionLog(err, msg)

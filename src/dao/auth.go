@@ -77,7 +77,7 @@ func UpdateTokenExpireTime(id int) (err error) {
 		tx.Commit()
 	}()
 	return tx.Model(&UserToken{}).Select("expire_time").Updates(map[string]interface{}{
-		"expire_time": consts.TokenExpireTime,
+		"expire_time": time.Now().Add(consts.ExpireDuration),
 	}).Error
 }
 
