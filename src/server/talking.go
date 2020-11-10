@@ -1,11 +1,14 @@
 package server
 
 import (
+	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
 	junebaotop "JuneGoBlog/src/junebao.top"
+	email "JuneGoBlog/src/junebao.top/email"
 	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
+	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
@@ -60,6 +63,45 @@ func TalkingAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.B
 		utils.ExceptionLog(err, msg)
 		return junebaotop.SystemErrorRespHeader
 	}
+	// 发送邮件通知
+	go func(r *message.TalkingAddReq) {
+		if r.PTalkID != 0 {
+			err = sendNotification(r)
+			if err != nil {
+				msg := fmt.Sprintf("send email error! %v", r)
+				utils.ExceptionLog(err, msg)
+			}
+		}
+		err = sendNotificationToAuthor(r)
+		if err != nil {
+			msg := fmt.Sprintf("send email error! %v", r)
+			utils.ExceptionLog(err, msg)
+		}
+	}(request)
 	resp.Header = junebaotop.SuccessRespHeader
 	return resp
+}
+
+func sendNotificationToAuthor(r *message.TalkingAddReq) error {
+	subject := "文章有了新评论"
+	article, _ := dao.QueryArticleByID(r.ArticleID)
+	body := util.GetNotificationTemplate(map[string]string{
+		"articleTitle": article.Title,
+		"talkerName":   r.Username,
+		"talkText":     r.Text,
+		"articleLink":  fmt.Sprintf("http://39.106.168.39/#/detail/%d", r.ArticleID),
+	})
+	return email.Send(subject, body, []string{src.Setting.MyEmail})
+}
+
+func sendNotification(r *message.TalkingAddReq) error {
+	subject := "JuneGoBlog 评论回复通知"
+	st, _ := dao.QueryTalkByTalkID(r.PTalkID)
+	body := util.GetTalkTemplate(map[string]string{
+		"siteLink":    "https://junebao.top",
+		"articleLink": fmt.Sprintf("http://39.106.168.39/#/detail/%d", r.ArticleID),
+		"sourceTalk":  st.Text,
+		"replyTalk":   r.Text,
+	})
+	return email.Send(subject, body, []string{st.Email})
 }

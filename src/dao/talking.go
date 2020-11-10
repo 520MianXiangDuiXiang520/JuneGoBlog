@@ -44,3 +44,8 @@ func QueryTalksByArticleIDLimit(articleID, page, pageSize int) ([]Talks, error) 
 	err := DB.Where("article_id = ?", articleID).Offset(offset).Limit(pageSize).Find(&talks).Error
 	return talks, err
 }
+
+func QueryTalkByTalkID(talkID int) (res Talks, err error) {
+	err = DB.Where("id = ?", talkID).First(&res).Error
+	return res, err
+}

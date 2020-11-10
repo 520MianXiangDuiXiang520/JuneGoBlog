@@ -1,4 +1,5 @@
 {
   "redis": true,
-  "abstractLen": 200
+  "abstractLen": 200,
+  "my_email": "15364968962@163.com"
 }
