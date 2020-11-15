@@ -429,7 +429,7 @@ func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	defer func() {
 		rp.Close()
 	}()
-	re, err := rp.Do("LPUSH", consts.ArticleIDListCache, newArticle.ID)
+	_, err = rp.Do("LPUSH", consts.ArticleIDListCache, newArticle.ID)
 	if err != nil {
 		msg := fmt.Sprintf("update %v fail, article id = %v", consts.ArticleIDListCache, newArticle.ID)
 		utils.ExceptionLog(err, msg)
@@ -437,7 +437,7 @@ func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	}
 
 	// 更新 ArticleListInfo
-	err = setNewArticleInfoToCache(int(re.(int64)), &ArticleListInfo{
+	err = setNewArticleInfoToCache(newArticle.ID, &ArticleListInfo{
 		ID:         newArticle.ID,
 		Title:      newArticle.Title,
 		Abstract:   newArticle.Abstract,
