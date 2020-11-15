@@ -146,7 +146,7 @@ func getAbstract(text string) string {
 	sp := src.Setting.AbstractLen
 	if len(abstractList) < 2 {
 		if len(text) > sp {
-			return text[:sp-3] + "..."
+			return string([]rune(text)[:sp-3]) + "..."
 		}
 		return text
 	}
@@ -155,7 +155,7 @@ func getAbstract(text string) string {
 	r := regexp.MustCompile("^#(.|\\r|)+").ReplaceAllString(abstractList[0], "")
 	r = strings.Replace(r, "\n", "", len(r))
 	if len(r) > sp {
-		return r[:sp-3] + "..."
+		return string([]rune(r)[:sp-3]) + "..."
 	}
 	return r
 }
