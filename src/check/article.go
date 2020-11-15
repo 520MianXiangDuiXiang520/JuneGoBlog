@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"unicode/utf8"
 )
 
 func ArticleListCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.BaseRespInter, error) {
@@ -48,7 +49,7 @@ func ArticleAddCheck(ctx *gin.Context, req junebaotop.BaseReqInter) (junebaotop.
 		len(request.Tags) == 0 {
 		return errResp, errors.New("")
 	}
-	if len(request.Title) > consts.MaxArticleTitleLen {
+	if utf8.RuneCountInString(request.Title) > consts.MaxArticleTitleLen {
 		return errResp, errors.New("TitleTooLong")
 	}
 	return http.StatusOK, nil

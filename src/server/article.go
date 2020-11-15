@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
@@ -145,7 +146,7 @@ func getAbstract(text string) string {
 	abstractList := strings.Split(text, consts.AbstractSplitStr)
 	sp := src.Setting.AbstractLen
 	if len(abstractList) < 2 {
-		if len(text) > sp {
+		if utf8.RuneCountInString(text) > sp {
 			return string([]rune(text)[:sp-3]) + "..."
 		}
 		return text
