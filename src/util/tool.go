@@ -1,8 +1,10 @@
 package util
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -28,4 +30,16 @@ func IsEmail(email string) bool {
 	emailRules := `^[A-Za-z0-9_.]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$`
 	ok, err := regexp.MatchString(emailRules, email)
 	return ok && err == nil
+}
+
+// RemoveTitle 用来删除 text 中的标题行
+// 标题行指以 1 到 6 个 # 开头，后面紧跟一个空格的行
+func RemoveTitle(text string) string {
+	res := ""
+	for _, v := range strings.Split(text, "\n") {
+		if !regexp.MustCompile("^[#]{1,6} .*").MatchString(v) {
+			res = fmt.Sprintf("%s%s", res, v)
+		}
+	}
+	return res
 }

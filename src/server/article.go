@@ -7,9 +7,9 @@ import (
 	junebaotop "JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
+	"JuneGoBlog/src/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"regexp"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -145,17 +145,21 @@ func ArticleAddLogic(ctx *gin.Context,
 func getAbstract(text string) string {
 	abstractList := strings.Split(text, consts.AbstractSplitStr)
 	sp := src.Setting.AbstractLen
+	// 没有显示定义摘要，提取文字前部分内容作为摘要
 	if len(abstractList) < 2 {
 		if utf8.RuneCountInString(text) > sp {
-			return string([]rune(text)[:sp-3]) + "..."
+			str := string([]rune(text)[:sp]) + "..."
+			str = util.RemoveTitle(str)
+			return strings.Replace(str, "\n", "", -1)
 		}
-		return text
+		// 文章很短的情况
+		str := util.RemoveTitle(text)
+		return strings.Replace(str, "\n", "", -1)
 	}
 
-	// 避免标题加入摘要
-	r := regexp.MustCompile("^#(.|\\r|)+").ReplaceAllString(abstractList[0], "")
+	r := util.RemoveTitle(abstractList[0])
 	r = strings.Replace(r, "\n", "", len(r))
-	if len(r) > sp {
+	if utf8.RuneCountInString(r) > sp {
 		return string([]rune(r)[:sp-3]) + "..."
 	}
 	return r

@@ -25,3 +25,29 @@ func TestIsEmail(t *testing.T) {
 		t.Error("email3 mis judgment")
 	}
 }
+
+func TestRemoveTitle(t *testing.T) {
+	text1 := `
+# 测试
+this is a test text
+## title2
+`
+	if res := RemoveTitle(text1); res != "this is a test text" {
+		t.Error("test1: ", res)
+	}
+
+	text2 := `
+this is a test text
+`
+	if res := RemoveTitle(text2); res != "this is a test text" {
+		t.Error("test1: ", res)
+	}
+
+	text3 := `
+this is a test text
+## title
+`
+	if res := RemoveTitle(text3); res != "this is a test text" {
+		t.Error("test1: ", res)
+	}
+}
