@@ -4,11 +4,11 @@ import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
-	junebaotop "JuneGoBlog/src/junebao.top"
-	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
 	"JuneGoBlog/src/util"
 	"fmt"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
@@ -20,7 +20,7 @@ func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
 	tagsInfoList := make([]message.TagInfo, 0)
 	if err := dao.QueryAllTagsByArticleID(id, &tags); err != nil {
 		msg := fmt.Sprintf("get all tags by article id fail, %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return tagsInfoList, err
 	}
 
@@ -28,7 +28,7 @@ func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
 		articleTotal, err := dao.QueryArticleTotalByTagID(tagInfo.ID)
 		if err != nil {
 			mes := fmt.Sprintf("query article total by cache fail !")
-			utils.ExceptionLog(err, mes)
+			juneLog.ExceptionLog(err, mes)
 			return nil, err
 		}
 		tagsInfoList = append(tagsInfoList, message.TagInfo{
@@ -42,19 +42,19 @@ func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
 }
 
 func ArticleTagsLogic(ctx *gin.Context,
-	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	reqL := req.(*message.ArticleTagsReq)
 	resp := message.ArticleTagsResp{}
 	tags, err := getArticleTagsInfo(reqL.ArticleID)
 	if err != nil {
 		mes := fmt.Sprintf("get article tags fail, "+
 			"article id = %v ", reqL.ArticleID)
-		utils.ExceptionLog(err, mes)
-		return junebaotop.SystemErrorRespHeader
+		juneLog.ExceptionLog(err, mes)
+		return juneGin.SystemErrorRespHeader
 	}
 	resp.ID = reqL.ArticleID
 	resp.Tags = tags
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }
 
@@ -65,7 +65,7 @@ func articleListByTag(tagID, page, pageSize int) (*message.ArticleListResp, erro
 		return nil, err
 	}
 	return &message.ArticleListResp{
-		Header:      junebaotop.SuccessRespHeader,
+		Header:      juneGin.SuccessRespHeader,
 		ArticleList: articleList,
 		Total:       total,
 	}, nil
@@ -73,30 +73,30 @@ func articleListByTag(tagID, page, pageSize int) (*message.ArticleListResp, erro
 
 // 文章列表逻辑
 func ArticleListLogic(ctx *gin.Context,
-	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	reqL := req.(*message.ArticleListReq)
 	resp := message.ArticleListResp{}
 
 	if reqL.Tag != 0 {
 		response, err := articleListByTag(reqL.Tag, reqL.Page, reqL.PageSize)
 		if err != nil {
-			return junebaotop.SystemErrorRespHeader
+			return juneGin.SystemErrorRespHeader
 		}
 		return response
 	}
 
 	articleList, total, err := dao.QueryArticleInfoByLimit(reqL.Page, reqL.PageSize)
 	if err != nil {
-		return junebaotop.SystemErrorRespHeader
+		return juneGin.SystemErrorRespHeader
 	}
 	resp.ArticleList = articleList
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	resp.Total = total
 	return resp
 }
 
 func ArticleDetailLogic(ctx *gin.Context,
-	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	resp := message.ArticleDetailResp{}
 	reqD := req.(*message.ArticleDetailReq)
 
@@ -107,17 +107,17 @@ func ArticleDetailLogic(ctx *gin.Context,
 	resp.Abstract = article.Abstract
 	resp.AuthorID = article.AuthorID
 	resp.Title = article.Title
-	resp.BaseRespHeader = junebaotop.SuccessRespHeader
+	resp.BaseRespHeader = juneGin.SuccessRespHeader
 	return resp
 }
 
 func ArticleAddLogic(ctx *gin.Context,
-	req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+	req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	request := req.(*message.ArticleAddReq)
 	resp := message.ArticleAddResp{}
 	user, ok := ctx.Get("user")
 	if !ok {
-		resp.Header = junebaotop.UnauthorizedRespHeader
+		resp.Header = juneGin.UnauthorizedRespHeader
 		return resp
 	}
 	author := user.(*dao.User)
@@ -135,16 +135,16 @@ func ArticleAddLogic(ctx *gin.Context,
 	}
 	_, err := dao.AddArticle(&newArticle, request.Tags)
 	if err != nil {
-		resp.Header = junebaotop.SystemErrorRespHeader
+		resp.Header = juneGin.SystemErrorRespHeader
 		return resp
 	}
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }
 
 func getAbstract(text string) string {
 	abstractList := strings.Split(text, consts.AbstractSplitStr)
-	sp := src.Setting.AbstractLen
+	sp := src.GetSetting().Others.AbstractLen
 	// 没有显示定义摘要，提取文字前部分内容作为摘要
 	if len(abstractList) < 2 {
 		if utf8.RuneCountInString(text) > sp {
@@ -165,13 +165,13 @@ func getAbstract(text string) string {
 	return r
 }
 
-func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+func ArticleUpdateLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	request := req.(*message.ArticleUpdateReq)
 	resp := message.ArticleUpdateResp{}
 
 	user, ok := ctx.Get("user")
 	if !ok {
-		return junebaotop.UnauthorizedRespHeader
+		return juneGin.UnauthorizedRespHeader
 	}
 	author := user.(*dao.User)
 
@@ -194,25 +194,25 @@ func ArticleUpdateLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaoto
 		// CreateTime: request.CreateTime,
 	})
 	if err != nil {
-		return junebaotop.SystemErrorRespHeader
+		return juneGin.SystemErrorRespHeader
 	}
 	// update article_tag table
 	err = dao.UpdateArticleTagsByIntList(request.ID, request.Tags)
 	if err != nil {
-		return junebaotop.SystemErrorRespHeader
+		return juneGin.SystemErrorRespHeader
 	}
 
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }
 
-func ArticleDeleteLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+func ArticleDeleteLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	request := req.(*message.ArticleDeleteReq)
 	resp := message.ArticleDeleteResp{}
 	err := dao.DeleteArticle(request.ID)
 	if err != nil {
-		return junebaotop.SystemErrorRespHeader
+		return juneGin.SystemErrorRespHeader
 	}
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }

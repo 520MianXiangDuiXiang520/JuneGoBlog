@@ -2,11 +2,11 @@ package routes
 
 import (
 	"JuneGoBlog/src/check"
-	junebao_top "JuneGoBlog/src/junebao.top"
-	"JuneGoBlog/src/junebao.top/middleware"
 	"JuneGoBlog/src/message"
-	middleware2 "JuneGoBlog/src/middleware"
+	"JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/server"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneMiddleware "github.com/520MianXiangDuiXiang520/GinTools/gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,48 +21,48 @@ func ArticleRegister(rg *gin.RouterGroup) {
 
 func articleTagsRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.ArticleTagsCheck,
+		juneGin.EasyHandler(check.ArticleTagsCheck,
 			server.ArticleTagsLogic, message.ArticleTagsReq{}),
 	}
 }
 
 func articleDetailRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.ArticleDetailCheck,
+		juneGin.EasyHandler(check.ArticleDetailCheck,
 			server.ArticleDetailLogic, message.ArticleDetailReq{}),
 	}
 }
 
 func articleListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.ArticleListCheck,
+		juneGin.EasyHandler(check.ArticleListCheck,
 			server.ArticleListLogic, message.ArticleListReq{}),
 	}
 }
 
 func articleAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.ArticleAddCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneMiddleware.Permiter(middleware.AdminPermit),
+		juneGin.EasyHandler(check.ArticleAddCheck,
 			server.ArticleAddLogic, message.ArticleAddReq{}),
 	}
 }
 
 func articleUpdateRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.ArticleUpdateCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneMiddleware.Permiter(middleware.AdminPermit),
+		juneGin.EasyHandler(check.ArticleUpdateCheck,
 			server.ArticleUpdateLogic, message.ArticleUpdateReq{}),
 	}
 }
 
 func articleDeleteRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.ArticleDeleteCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneMiddleware.Permiter(middleware.AdminPermit),
+		juneGin.EasyHandler(check.ArticleDeleteCheck,
 			server.ArticleDeleteLogic, message.ArticleDeleteReq{}),
 	}
 }

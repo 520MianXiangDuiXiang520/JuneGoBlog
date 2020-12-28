@@ -1,20 +1,21 @@
 package main
 
 import (
-	"JuneGoBlog/src/junebao.top"
-	middleware2 "JuneGoBlog/src/junebao.top/middleware"
+	"JuneGoBlog/src"
 	"JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/routes"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneMiddle "github.com/520MianXiangDuiXiang520/GinTools/gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func Register(c *gin.Engine) {
-	c.Use(middleware.ApiView(), middleware2.CorsHandler())
-	junebao_top.URLPatterns(c, "api/article", routes.ArticleRegister)
-	junebao_top.URLPatterns(c, "api/tag", routes.TagRegister)
-	junebao_top.URLPatterns(c, "api/talking", routes.TalkingRegister)
-	junebao_top.URLPatterns(c, "api/admin", routes.AdminRegister)
-	junebao_top.URLPatterns(c, "api/friendship", routes.FriendShipRoutes)
-	junebao_top.URLPatterns(c, "api/auth", routes.AuthRegister)
+	c.Use(middleware.ApiView(), juneMiddle.CorsHandler(src.GetSetting().CorsAccessList))
+	juneGin.URLPatterns(c, "api/article", routes.ArticleRegister)
+	juneGin.URLPatterns(c, "api/tag", routes.TagRegister)
+	juneGin.URLPatterns(c, "api/talking", routes.TalkingRegister)
+	juneGin.URLPatterns(c, "api/admin", routes.AdminRegister)
+	juneGin.URLPatterns(c, "api/friendship", routes.FriendShipRoutes)
+	juneGin.URLPatterns(c, "api/auth", routes.AuthRegister)
 
 }

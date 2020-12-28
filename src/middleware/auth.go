@@ -2,7 +2,8 @@ package middleware
 
 import (
 	"JuneGoBlog/src/dao"
-	"JuneGoBlog/src/junebao.top/middleware"
+	"github.com/520MianXiangDuiXiang520/GinTools/gin/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 

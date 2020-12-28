@@ -1,7 +1,7 @@
 package message
 
 import (
-	"JuneGoBlog/src/junebao.top"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +22,9 @@ type TagInfo struct {
 
 // api/tag/list 响应格式
 type TagListResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"` // 响应头
-	Total  int                        `json:"total"`  // 标签总数
-	Tags   []TagInfo                  `json:"tags"`   // 标签列表
+	Header juneGin.BaseRespHeader `json:"header"` // 响应头
+	Total  int                    `json:"total"`  // 标签总数
+	Tags   []TagInfo              `json:"tags"`   // 标签列表
 }
 
 type TagAddReq struct {
@@ -36,5 +36,5 @@ func (taq *TagAddReq) JSON(ctx *gin.Context) error {
 }
 
 type TagAddResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }

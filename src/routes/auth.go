@@ -2,11 +2,11 @@ package routes
 
 import (
 	"JuneGoBlog/src/check"
-	junebao_top "JuneGoBlog/src/junebao.top"
-	"JuneGoBlog/src/junebao.top/middleware"
 	"JuneGoBlog/src/message"
-	middleware2 "JuneGoBlog/src/middleware"
+	"JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/server"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneMiddleware "github.com/520MianXiangDuiXiang520/GinTools/gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,23 +18,23 @@ func AuthRegister(rg *gin.RouterGroup) {
 
 func authLoginRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.AuthLoginCheck,
+		juneGin.EasyHandler(check.AuthLoginCheck,
 			server.AuthLoginLogic, message.AuthLoginReq{}),
 	}
 }
 
 func authInfoRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		junebao_top.EasyHandler(check.AuthInfoCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneGin.EasyHandler(check.AuthInfoCheck,
 			server.AuthInfoLogic, message.AuthInfoReq{}),
 	}
 }
 
 func authLogoutRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		junebao_top.EasyHandler(check.AuthLogoutCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneGin.EasyHandler(check.AuthLogoutCheck,
 			server.AuthLogoutLogic, message.AuthLogoutReq{}),
 	}
 }

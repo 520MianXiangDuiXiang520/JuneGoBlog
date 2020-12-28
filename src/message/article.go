@@ -2,39 +2,39 @@ package message
 
 import (
 	"JuneGoBlog/src/dao"
-	junebaotop "JuneGoBlog/src/junebao.top"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 )
 
 type ArticleTagsResp struct {
-	Header junebaotop.BaseRespHeader `json:"header"` // 响应头
-	ID     int                       `json:"id"`
-	Tags   []TagInfo                 `json:"tags"`
+	Header juneGin.BaseRespHeader `json:"header"` // 响应头
+	ID     int                    `json:"id"`
+	Tags   []TagInfo              `json:"tags"`
 }
 
 type ArticleTagsReq struct {
-	ArticleID int `json:"articleID"form:"articleID"`
+	ArticleID int `json:"articleID" form:"articleID" check:"more: 0"`
 }
 
 type ArticleListResp struct {
-	Header      junebaotop.BaseRespHeader `json:"header"`      // 响应头
-	ArticleList []dao.ArticleListInfo     `json:"articleList"` // 文章列表
-	Total       int                       `json:"total"`       // 将返回的文章总数
+	Header      juneGin.BaseRespHeader `json:"header"`      // 响应头
+	ArticleList []dao.ArticleListInfo  `json:"articleList"` // 文章列表
+	Total       int                    `json:"total"`       // 将返回的文章总数
 }
 
 // 请求文章列表格式
 type ArticleListReq struct {
-	Page     int `json:"page"form:"page"`         // 页数
-	PageSize int `json:"pageSize"form:"pageSize"` // 每页请求的文章数量
-	Tag      int `json:"tag"form:"tag"`           // 标签
+	Page     int `json:"page" form:"page" check:"not null; more: 0"`              // 页数
+	PageSize int `json:"pageSize" form:"pageSize" check:"not null; size: [5,20]"` // 每页请求的文章数量
+	Tag      int `json:"tag" form:"tag"`                                          // 标签
 }
 
 type ArticleDetailReq struct {
-	ArticleID int `json:"articleId"`
+	ArticleID int `json:"articleId" check:"more: 0"`
 }
 
 type ArticleDetailResp struct {
-	junebaotop.BaseRespHeader
+	juneGin.BaseRespHeader
 	dao.Article
 	Text string `json:"text"`
 }
@@ -52,12 +52,14 @@ func (adr *ArticleDetailReq) JSON(ctx *gin.Context) error {
 }
 
 type ArticleAddResp struct {
-	Header junebaotop.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 type ArticleAddReq struct {
-	dao.Article
-	Tags []int `json:"tags"`
+	Title    string `json:"title" check:"not null"`
+	Abstract string `json:"abstract" check:"not null"`
+	Text     string `json:"text" check:"not null"`
+	Tags     []int  `json:"tags"`
 }
 
 func (r *ArticleAddReq) JSON(ctx *gin.Context) error {
@@ -65,12 +67,15 @@ func (r *ArticleAddReq) JSON(ctx *gin.Context) error {
 }
 
 type ArticleUpdateResp struct {
-	Header junebaotop.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 type ArticleUpdateReq struct {
-	dao.Article
-	Tags []int `json:"tags"`
+	ID       int    `json:"id" check:"not null"`
+	Title    string `json:"title" check:"not null"`
+	Abstract string `json:"abstract" check:"not null"`
+	Text     string `json:"text" check:"not null"`
+	Tags     []int  `json:"tags"`
 }
 
 func (r *ArticleUpdateReq) JSON(ctx *gin.Context) error {
@@ -78,11 +83,11 @@ func (r *ArticleUpdateReq) JSON(ctx *gin.Context) error {
 }
 
 type ArticleDeleteResp struct {
-	Header junebaotop.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 type ArticleDeleteReq struct {
-	ID int `json:"id"`
+	ID int `json:"id" check:"not null"`
 }
 
 func (r *ArticleDeleteReq) JSON(ctx *gin.Context) error {

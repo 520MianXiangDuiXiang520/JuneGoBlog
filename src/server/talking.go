@@ -4,43 +4,43 @@ import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
-	junebaotop "JuneGoBlog/src/junebao.top"
-	email "JuneGoBlog/src/junebao.top/email"
-	"JuneGoBlog/src/junebao.top/utils"
 	"JuneGoBlog/src/message"
 	"JuneGoBlog/src/util"
 	"fmt"
+	juneEmail "github.com/520MianXiangDuiXiang520/GinTools/email"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
 )
 
-func TalkingListLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+func TalkingListLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	request := req.(*message.TalkingListReq)
 	resp := message.TalkingListResp{}
 	talks, err := dao.QueryTalksByArticleIDLimit(request.ArticleID, request.Page, request.PageSize)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to query talks, request is %v ", request)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 	}
 	resp.HasNext = true
 	if len(talks) < request.PageSize {
 		resp.HasNext = false
 	}
 	resp.Talks = talks
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }
 
-func TalkingAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.BaseRespInter {
+func TalkingAddLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	request := req.(*message.TalkingAddReq)
 	resp := message.TalkingAddResp{}
 	if !dao.HasArticle(request.ArticleID) {
-		return junebaotop.ParamErrorRespHeader
+		return juneGin.ParamErrorRespHeader
 	}
 	if request.Type == consts.ChildTalkType {
 		if !dao.HasTalk(request.PTalkID) {
-			return junebaotop.ParamErrorRespHeader
+			return juneGin.ParamErrorRespHeader
 		}
 	} else {
 		request.PTalkID = 0
@@ -60,8 +60,8 @@ func TalkingAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.B
 	})
 	if err != nil {
 		msg := fmt.Sprintf("Fail to add new talk, request = %v", request)
-		utils.ExceptionLog(err, msg)
-		return junebaotop.SystemErrorRespHeader
+		juneLog.ExceptionLog(err, msg)
+		return juneGin.SystemErrorRespHeader
 	}
 	// 发送邮件通知
 	go func(r *message.TalkingAddReq) {
@@ -69,16 +69,16 @@ func TalkingAddLogic(ctx *gin.Context, req junebaotop.BaseReqInter) junebaotop.B
 			err = sendNotification(r)
 			if err != nil {
 				msg := fmt.Sprintf("send email error! %v", r)
-				utils.ExceptionLog(err, msg)
+				juneLog.ExceptionLog(err, msg)
 			}
 		}
 		err = sendNotificationToAuthor(r)
 		if err != nil {
 			msg := fmt.Sprintf("send email error! %v", r)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 		}
 	}(request)
-	resp.Header = junebaotop.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }
 
@@ -89,19 +89,31 @@ func sendNotificationToAuthor(r *message.TalkingAddReq) error {
 		"articleTitle": article.Title,
 		"talkerName":   r.Username,
 		"talkText":     r.Text,
-		"articleLink":  fmt.Sprintf("http://39.106.168.39/#/detail/%d", r.ArticleID),
+		"articleLink":  fmt.Sprintf("%s%d", src.GetSetting().Others.DetailLink, r.ArticleID),
 	})
-	return email.Send(subject, body, []string{src.Setting.MyEmail})
+	return juneEmail.Send(&juneEmail.Context{
+		ToList: []juneEmail.Role{
+			{Address: src.GetSetting().Others.MyEmail},
+		},
+		Subject: subject,
+		Body:    body,
+	})
 }
 
 func sendNotification(r *message.TalkingAddReq) error {
 	subject := "JuneGoBlog 评论回复通知"
 	st, _ := dao.QueryTalkByTalkID(r.PTalkID)
 	body := util.GetTalkTemplate(map[string]string{
-		"siteLink":    "https://junebao.top",
+		"siteLink":    src.GetSetting().Others.SiteLink,
 		"articleLink": fmt.Sprintf("http://39.106.168.39/#/detail/%d", r.ArticleID),
 		"sourceTalk":  st.Text,
 		"replyTalk":   r.Text,
 	})
-	return email.Send(subject, body, []string{st.Email})
+	return juneEmail.Send(&juneEmail.Context{
+		ToList: []juneEmail.Role{
+			{Address: r.Email, Name: r.Username},
+		},
+		Subject: subject,
+		Body:    body,
+	})
 }

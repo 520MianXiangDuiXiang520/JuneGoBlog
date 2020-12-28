@@ -3,8 +3,9 @@ package dao
 import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
+	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"log"
 	"strconv"
 	"strings"
@@ -23,12 +24,12 @@ import (
 // }
 
 func InsertArticleTag(at *ArticleTags) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("insert  articleTag fail, article id = %v, tag id = %v,", at.ArticleID, at.TagID)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -39,24 +40,24 @@ func InsertArticleTag(at *ArticleTags) error {
 
 func QueryAllTagsByArticleID(articleID int, tags *[]Tag) error {
 	at := make([]ArticleTags, 0)
-	DB.Where("article_id = ?", articleID).Find(&at)
+	juneDao.GetDB().Where("article_id = ?", articleID).Find(&at)
 	tagsID := make([]int, 0)
 	for _, tag := range at {
 		tagsID = append(tagsID, tag.TagID)
 	}
-	return DB.Where("id IN (?)", tagsID).Find(&tags).Error
+	return juneDao.GetDB().Where("id IN (?)", tagsID).Find(&tags).Error
 }
 
 func QueryArticleTotalByTagIDFromDB(tagID int) int {
 	var total int
-	DB.Model(&ArticleTags{}).Where("tag_id = ?", tagID).Count(&total)
+	juneDao.GetDB().Model(&ArticleTags{}).Where("tag_id = ?", tagID).Count(&total)
 	return total
 }
 
 func QueryArticleTotalByTagID(tagID int) (int, error) {
 	// var err error
 	// var result int
-	// if src.Setting.Redis {
+	// if src.GetSetting().Others.Redis {
 	// 	result, err = QueryArticleTotalByTagIDFromCache(tagID)
 	// 	if err != nil {
 	// 		return QueryArticleTotalByTagIDFromDB(tagID), err
@@ -72,7 +73,7 @@ func hasTagsChanged(articleID int, tags []*Tag) bool {
 	err := QueryAllTagsByArticleID(articleID, &history)
 	if err != nil {
 		msg := fmt.Sprintf("query all tags by article id fail, article id = %v", articleID)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return true
 	}
 	if len(history) != len(tags) {
@@ -94,12 +95,12 @@ func hasTagsChanged(articleID int, tags []*Tag) bool {
 }
 
 func DeleteArticleTags(articleID int) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("delete articleTag fail, article id = %v", articleID)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -109,7 +110,7 @@ func DeleteArticleTags(articleID int) error {
 }
 
 func updateArticleTagsToCache(articleID int, tags []*Tag) error {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 	tIDs := make([]string, len(tags))
 	for i, t := range tags {
@@ -119,7 +120,7 @@ func updateArticleTagsToCache(articleID int, tags []*Tag) error {
 		"Tags", strings.Join(tIDs, consts.CacheTagsSplitStr))
 	if err != nil {
 		msg := fmt.Sprintf("do hset fail when update article tags, tIDs = %v", tIDs)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 	}
 	return err
 }
@@ -144,7 +145,7 @@ func UpdateArticleTags(articleID int, tags []*Tag) error {
 			return err
 		}
 	}
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		_ = updateArticleTagsToCache(articleID, tags)
 	}
 	return nil
@@ -166,12 +167,12 @@ func UpdateArticleTagsByIntList(articleID int, intTags []int) error {
 func QueryAllArticleByTagID(tagID int) ([]ArticleTags, error) {
 	// TODO: 使用缓存
 	result := make([]ArticleTags, 0)
-	DB.LogMode(true)
-	err := DB.Model(&ArticleTags{}).Where("tag_id = ?", tagID).Find(&result).Error
+	juneDao.GetDB().LogMode(true)
+	err := juneDao.GetDB().Model(&ArticleTags{}).Where("tag_id = ?", tagID).Find(&result).Error
 
 	if err != nil {
 		msg := fmt.Sprintf("Query All Article By TagID fail, tagid = %v", tagID)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return nil, err
 	}
 	return result, err

@@ -2,11 +2,11 @@ package routes
 
 import (
 	"JuneGoBlog/src/check"
-	"JuneGoBlog/src/junebao.top"
-	"JuneGoBlog/src/junebao.top/middleware"
 	"JuneGoBlog/src/message"
-	middleware2 "JuneGoBlog/src/middleware"
+	"JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/server"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneMiddleware "github.com/520MianXiangDuiXiang520/GinTools/gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,41 +20,41 @@ func FriendShipRoutes(rg *gin.RouterGroup) {
 
 func friendshipUnShowRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.FriendShipUnShowListCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneMiddleware.Permiter(middleware.AdminPermit),
+		juneGin.EasyHandler(check.FriendShipUnShowListCheck,
 			server.FriendUnShowListLogic, message.FriendUnShowListReq{}),
 	}
 }
 
 func friendApprovalRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.FriendApprovalCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneMiddleware.Permiter(middleware.AdminPermit),
+		juneGin.EasyHandler(check.FriendApprovalCheck,
 			server.FriendApprovalLogic, message.FriendApprovalReq{}),
 	}
 }
 
 func friendDeleteRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		middleware.Auth(middleware2.TokenAuth),
-		middleware.Permiter(middleware2.AdminPermit),
-		junebao_top.EasyHandler(check.FriendDeleteCheck,
+		juneMiddleware.Auth(middleware.TokenAuth),
+		juneMiddleware.Permiter(middleware.AdminPermit),
+		juneGin.EasyHandler(check.FriendDeleteCheck,
 			server.FriendDeleteLogic, message.FriendDeleteReq{}),
 	}
 }
 
 func friendApplicationRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.FriendApplicationCheck,
+		juneGin.EasyHandler(check.FriendApplicationCheck,
 			server.FriendApplicationLogic, message.FriendApplicationReq{}),
 	}
 }
 
 func friendListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.FriendShipListCheck,
+		juneGin.EasyHandler(check.FriendShipListCheck,
 			server.FriendShipListLogic, message.FriendShipListReq{}),
 	}
 }

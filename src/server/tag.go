@@ -2,24 +2,26 @@ package server
 
 import (
 	"JuneGoBlog/src/dao"
-	"JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
+	"fmt"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
-func TagListLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
+func TagListLogin(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	var resp message.TagListResp
 	tags := make([]dao.Tag, 0)
 	if err := dao.QueryAllTagsOrderByTime(&tags); err != nil {
-		log.Printf("QueryAllTagsOrderByTime Error!!!")
-		return junebao_top.SystemErrorRespHeader
+		msg := fmt.Sprintf("QueryAllTagsOrderByTime Error!!!")
+		juneLog.ExceptionLog(err, msg)
+		return juneGin.SystemErrorRespHeader
 	}
 	tagInfos := make([]message.TagInfo, 0)
 	for _, tag := range tags {
 		articleTotal, err := dao.QueryArticleTotalByTagID(tag.ID)
 		if err != nil {
-			return junebao_top.SystemErrorRespHeader
+			return juneGin.SystemErrorRespHeader
 		}
 		tagInfos = append(tagInfos, message.TagInfo{
 			ID:           tag.ID,
@@ -30,17 +32,18 @@ func TagListLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.Ba
 	}
 	resp.Tags = tagInfos
 	resp.Total = len(tagInfos)
-	resp.Header = junebao_top.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }
 
-func TagAddLogin(ctx *gin.Context, req junebao_top.BaseReqInter) junebao_top.BaseRespInter {
+func TagAddLogin(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	reqA := req.(*message.TagAddReq)
 	var resp message.TagAddResp
 	if err := dao.AddTag(reqA.TagName); err != nil {
-		log.Printf("Add Tag Error, name = [%s]\n", reqA.TagName)
-		return junebao_top.SystemErrorRespHeader
+		msg := fmt.Sprintf("Add Tag Error, name = [%s]\n", reqA.TagName)
+		juneLog.ExceptionLog(err, msg)
+		return juneGin.SystemErrorRespHeader
 	}
-	resp.Header = junebao_top.SuccessRespHeader
+	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }

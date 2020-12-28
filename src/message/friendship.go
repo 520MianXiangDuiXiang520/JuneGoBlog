@@ -2,14 +2,14 @@ package message
 
 import (
 	"JuneGoBlog/src/dao"
-	"JuneGoBlog/src/junebao.top"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 )
 
 type FriendShipListResp struct {
-	Header         junebao_top.BaseRespHeader `json:"header"`         // 响应头
-	Total          int                        `json:"total"`          // 友链总数
-	FriendShipList []dao.FriendShipLink       `json:"friendShipList"` // 友链列表
+	Header         juneGin.BaseRespHeader `json:"header"`         // 响应头
+	Total          int                    `json:"total"`          // 友链总数
+	FriendShipList []dao.FriendShipLink   `json:"friendShipList"` // 友链列表
 }
 
 type FriendShipListReq struct{}
@@ -24,7 +24,7 @@ type FriendApplicationReq struct {
 
 // 申请添加友链响应格式
 type FriendApplicationResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 // 友链申请审批请求
@@ -35,7 +35,7 @@ type FriendApprovalReq struct {
 
 // 友链审批响应
 type FriendApprovalResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 // 删除友链请求格式
@@ -45,7 +45,7 @@ type FriendDeleteReq struct {
 
 // 删除友链响应格式
 type FriendDeleteResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 // 获取申请中（未展示）的友链列表请求

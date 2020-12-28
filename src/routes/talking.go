@@ -3,10 +3,8 @@ package routes
 import (
 	"JuneGoBlog/src/check"
 	"JuneGoBlog/src/message"
-
-	//"JuneGoBlog/src/junebao.top"
-	junebao_top "JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/server"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,14 +15,14 @@ func TalkingRegister(rg *gin.RouterGroup) {
 
 func talkingListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.TalkingListCheck,
+		juneGin.EasyHandler(check.TalkingListCheck,
 			server.TalkingListLogic, message.TalkingListReq{}),
 	}
 }
 
 func talkingAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		junebao_top.EasyHandler(check.TalkingAddCheck,
+		juneGin.EasyHandler(check.TalkingAddCheck,
 			server.TalkingAddLogic, message.TalkingAddReq{}),
 	}
 }

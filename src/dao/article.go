@@ -3,9 +3,10 @@ package dao
 import (
 	"JuneGoBlog/src"
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/junebao.top/utils"
 	"errors"
 	"fmt"
+	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"reflect"
@@ -19,7 +20,7 @@ import (
 * Time: 2020/8/22 16:21
 **/
 func QueryArticleIDFromCacheByIndex(index int) (int, error) {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 	value, err := redis.String(rc.Do("LINDEX", consts.ArticleIDListCache, index))
 	v, _ := strconv.Atoi(value)
@@ -34,7 +35,7 @@ func QueryArticleIDFromCacheByIndex(index int) (int, error) {
 func queryArticleIDListFromCache(page, pageSize, total int) ([]int, error) {
 	start := (page-1)*pageSize + 1
 	r := make([]int, 0)
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 	newPageSize := total - start + 1
 	if newPageSize < pageSize {
@@ -74,7 +75,7 @@ func queryArticleIDListFromCache(page, pageSize, total int) ([]int, error) {
 * Time: 2020/8/22 11:52
 **/
 func setNewArticleInfoToCache(id int, article *ArticleListInfo) error {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 	fields := []string{
 		"Title", "Abstract", "ID", "Author", "CreateTime",
@@ -97,7 +98,7 @@ func setNewArticleInfoToCache(id int, article *ArticleListInfo) error {
 		"Tags", strings.Join(tagIDs, consts.CacheTagsSplitStr))
 	if err != nil {
 		msg := fmt.Sprintf("Failed to insert tag information into cache, tags = %v, articleID = %v", tagIDs, id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
@@ -137,7 +138,7 @@ func queryArticleInfoFromCache(id int) (ArticleListInfo, error) {
 	}
 	result := ArticleListInfo{}
 	articleFields := make([]string, 0)
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	tags := make([]Tag, 0)
 	// 如果这篇文章的标签信息没在缓存中， 就会从数据库中查找，这样就不需要再根据id查找了
 	queryTagFlag := true
@@ -146,15 +147,15 @@ func queryArticleInfoFromCache(id int) (ArticleListInfo, error) {
 		err := rc.Send("Hget", consts.ArticleInfoHashCache+strconv.Itoa(id), field)
 		if err != nil {
 			msg := fmt.Sprintf("Hget article info from redis fail, article id = %v, field = %v", id, field)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 		}
 	}
-	utils.ExceptionLog(rc.Flush(), "redis flush fail")
+	juneLog.ExceptionLog(rc.Flush(), "redis flush fail")
 	for _, field := range fields {
 		r, err := rc.Receive()
 		if err != nil {
 			msg := fmt.Sprintf("do rc.Receive fail, article id = %v", id)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			return result, err
 		}
 		// 缓存未命中
@@ -212,12 +213,12 @@ func queryArticleInfoByLimitByCache(page, pageSize, total int) ([]ArticleListInf
 	ids, err := queryArticleIDListFromCache(page, pageSize, total)
 
 	if err != nil {
-		utils.LogPlus("从缓存中获取文章ID列表失败")
+		juneLog.LogPlus("从缓存中获取文章ID列表失败")
 		go func() {
 			iErr := InitArticleIDListCache()
 			if iErr != nil {
 				msg := fmt.Sprintf("Failed to update the article ID in the cache asynchronously")
-				utils.ExceptionLog(iErr, msg)
+				juneLog.ExceptionLog(iErr, msg)
 			}
 		}()
 		return nil, err
@@ -245,18 +246,18 @@ func QueryArticleInfoByLimit(page, pageSize int) ([]ArticleListInfo, int, error)
 	if err != nil {
 		return nil, 0, err
 	}
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		result, err := queryArticleInfoByLimitByCache(page, pageSize, total)
 		if err == nil {
 			return result, total, err
 		}
-		utils.LogPlus("Fail to query from cache!!")
+		juneLog.LogPlus("Fail to query from cache!!")
 	}
 
 	// 缓存中没有查到，从数据库中查
 	start := (page - 1) * pageSize
 	if total < start {
-		utils.LogPlus("total < start")
+		juneLog.LogPlus("total < start")
 		return nil, 0, errors.New("total < start")
 	}
 	newPageSize := total - start
@@ -265,7 +266,7 @@ func QueryArticleInfoByLimit(page, pageSize int) ([]ArticleListInfo, int, error)
 	}
 	articleList := make([]Article, 0)
 
-	err = DB.Order("create_time desc").Limit(pageSize).Offset(start).Find(&articleList).Error
+	err = juneDao.GetDB().Order("create_time desc").Limit(pageSize).Offset(start).Find(&articleList).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -275,7 +276,7 @@ func QueryArticleInfoByLimit(page, pageSize int) ([]ArticleListInfo, int, error)
 		err := QueryAllTagsByArticleID(article.ID, &tags)
 		if err != nil {
 			msg := fmt.Sprintf("get article tags fail, article id = %v", article.ID)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 		}
 		articleListInfos[i] = ArticleListInfo{
 			Tags:       tags,
@@ -303,7 +304,7 @@ func QueryArticleInfoByLimitWithTag(tagID, page, pageSize int) ([]ArticleListInf
 	total := len(aIDs)
 	start := (page - 1) * pageSize
 	if total < start {
-		utils.LogPlus("total < start")
+		juneLog.LogPlus("total < start")
 		return nil, 0, errors.New("total < start")
 	}
 	newPageSize := total - start
@@ -327,7 +328,7 @@ func QueryArticleInfoByLimitWithTag(tagID, page, pageSize int) ([]ArticleListInf
 }
 
 func QueryAllArticle(articleList *[]Article) error {
-	return DB.Order("create_time desc").Find(&articleList).Error
+	return juneDao.GetDB().Order("create_time desc").Find(&articleList).Error
 }
 
 /**
@@ -338,18 +339,18 @@ func QueryAllArticle(articleList *[]Article) error {
 func QueryArticleListInfoByIDWithDB(id int) (ArticleListInfo, error) {
 	result := ArticleListInfo{}
 	article := Article{}
-	err := DB.Select("id, title, abstract,"+
+	err := juneDao.GetDB().Select("id, title, abstract,"+
 		" author_id, create_time").Where("id = ?", id).First(&article).Error
 	if err != nil {
 		msg := fmt.Sprintf("query article by id fail, article id = %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return result, err
 	}
 	tags := make([]Tag, 0)
 	err = QueryAllTagsByArticleID(id, &tags)
 	if err != nil {
 		msg := fmt.Sprintf("query all tags by articleID fail, articleID = %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return result, err
 	}
 	result = ArticleListInfo{
@@ -370,7 +371,7 @@ func QueryArticleListInfoByIDWithDB(id int) (ArticleListInfo, error) {
 **/
 func QueryArticleByID(id int) (ArticleListInfo, error) {
 	var articleListInfo ArticleListInfo
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		return queryArticleInfoFromCache(id)
 	}
 	articleListInfo, err := QueryArticleListInfoByIDWithDB(id)
@@ -380,23 +381,23 @@ func QueryArticleByID(id int) (ArticleListInfo, error) {
 
 func QueryArticleDetail(id int) (Article, error) {
 	a := Article{}
-	r := DB.Where("id = ?", id).First(&a)
+	r := juneDao.GetDB().Where("id = ?", id).First(&a)
 	return a, r.Error
 }
 
 func queryArticleTotalByCache() (int, error) {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 	result, err := redis.Int(rc.Do("LLen", consts.ArticleIDListCache))
 	if err != nil {
 		msg := fmt.Sprintf("Fail to query articles total")
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return 0, err
 	}
 	if result == 0 {
 		msg := fmt.Sprintf("The total number of articles queried from the cache is 0")
 		err := errors.New("ResultIsZero")
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return 0, err
 	}
 	return result, nil
@@ -404,14 +405,14 @@ func queryArticleTotalByCache() (int, error) {
 
 func queryArticleTotalByDB() (int, error) {
 	var total int
-	c := DB.Model(&Article{}).Count(&total)
+	c := juneDao.GetDB().Model(&Article{}).Count(&total)
 	return total, c.Error
 }
 
 func QueryArticleTotal() (int, error) {
 	var total int
 	var err error
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		total, err = queryArticleTotalByCache()
 		if err != nil {
 			log.Printf("通过缓存获取文章总数失败！！！: %v", err)
@@ -424,7 +425,7 @@ func QueryArticleTotal() (int, error) {
 
 func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	// 更新 ArticleIDList
-	rp := RedisPool.Get()
+	rp := juneDao.GetRedisConn()
 	var err error
 	defer func() {
 		rp.Close()
@@ -432,7 +433,7 @@ func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	_, err = rp.Do("LPUSH", consts.ArticleIDListCache, newArticle.ID)
 	if err != nil {
 		msg := fmt.Sprintf("update %v fail, article id = %v", consts.ArticleIDListCache, newArticle.ID)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
 
@@ -447,18 +448,18 @@ func addArticleWithCache(newArticle *Article, tags []Tag) error {
 	})
 	if err != nil {
 		msg := fmt.Sprintf("update %v fail, article id = %v", "article info", newArticle.ID)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 	}
 	return err
 }
 
 func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("insert new article fail, title = %v", newArticle.Title)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -477,7 +478,7 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 		if tag == nil {
 			msg := fmt.Sprintf("Get nil when query tag, tagID = %v", tagID)
 			err := errors.New("return nil")
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			return nil, err
 		}
 		tags[i] = *tag
@@ -489,11 +490,11 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 		if err != nil {
 			msg := fmt.Sprintf("fail to insert new article tag;"+
 				" articleID = %v, tagID = %v", newArticle.ID, tagID)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			return nil, err
 		}
 	}
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		_ = addArticleWithCache(newArticle, tags)
 	}
 	return newArticle, err
@@ -501,19 +502,19 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 
 func hasArticleWithDB(id int) bool {
 	article := &Article{}
-	DB.Where("id = ?", id).First(article)
+	juneDao.GetDB().Where("id = ?", id).First(article)
 	return article.ID != 0
 }
 
 func HasArticle(id int) bool {
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		// TODO: bitmap
 	}
 	return hasArticleWithDB(id)
 }
 
 func updateArticleWithCache(id int, article *Article) error {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer func() {
 		rc.Close()
 	}()
@@ -524,25 +525,25 @@ func updateArticleWithCache(id int, article *Article) error {
 		"Abstract", article.Abstract)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to send new value with cache when update article, article = %v", article)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
 	err = rc.Flush()
 	if err != nil {
 		msg := fmt.Sprintf("flush fail, id = %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
 }
 
 func UpdateArticle(id int, article *Article) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("update article fail, id = %v, title = %v", id, article.Title)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -551,14 +552,14 @@ func UpdateArticle(id int, article *Article) error {
 	err = tx.Model(&Article{}).Omit("create_time").Where("id = ?", id).Updates(article).Error
 	if err != nil {
 		msg := fmt.Sprintf("Fail to update article table, articleID = %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		err = updateArticleWithCache(id, article)
 		if err != nil {
 			msg := fmt.Sprintf("Fail to update article cache, articleID = %v", id)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			return err
 		}
 	}
@@ -566,13 +567,12 @@ func UpdateArticle(id int, article *Article) error {
 }
 
 func deleteArticleFromDB(id int) error {
-	DB.LogMode(true)
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("Fail to delete article from db, article id = %v", id)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -585,26 +585,26 @@ func deleteArticleFromDB(id int) error {
 }
 
 func deleteArticleIDListCacheByID(id int) error {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 
 	_, err := rc.Do("LREM", consts.ArticleIDListCache, 0, id)
 	if err != nil {
 		msg := fmt.Sprintf("Fail to delete ArticleIDListCache by id, id = %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
 }
 
 func deleteArticleInfoHashCacheByID(id int) error {
-	rc := RedisPool.Get()
+	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 
 	_, err := rc.Do("DEL", consts.ArticleInfoHashCache+strconv.Itoa(id))
 	if err != nil {
 		msg := fmt.Sprintf("Fail to delete ArticleInfoHashCache by id, id = %v", id)
-		utils.ExceptionLog(err, msg)
+		juneLog.ExceptionLog(err, msg)
 		return err
 	}
 	return nil
@@ -633,7 +633,7 @@ func DeleteArticle(id int) error {
 		return err
 	}
 	// 2. 从 Redis 中删除
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		err := deleteArticleFromCache(id)
 		if err != nil {
 			return err

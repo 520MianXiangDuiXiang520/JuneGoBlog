@@ -67,8 +67,8 @@ Fan-In
 <!-- more -->
 vvv
 `)
-	if utf8.RuneCountInString(r) != src.Setting.AbstractLen ||
-		string([]rune(r)[src.Setting.AbstractLen-3:]) != "..." {
+	if utf8.RuneCountInString(r) != src.GetSetting().Others.AbstractLen ||
+		string([]rune(r)[src.GetSetting().Others.AbstractLen-3:]) != "..." {
 		t.Error("指定摘要且摘要长度足够时，测试未通过")
 	}
 }

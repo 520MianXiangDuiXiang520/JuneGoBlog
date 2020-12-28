@@ -1,28 +1,29 @@
 package dao
 
 import (
+	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
 	"log"
 )
 
 // 查询所有的友链信息
 func QueryAllFriendLink(fl *[]FriendShipLink) error {
-	return DB.Find(&fl).Error
+	return juneDao.GetDB().Find(&fl).Error
 }
 
 // 查询所有状态为 status 的友链
 func QueryAllFriendLinkByStatus(status int, fl *[]FriendShipLink) error {
-	return DB.Where("status = ?", status).Find(&fl).Error
+	return juneDao.GetDB().Where("status = ?", status).Find(&fl).Error
 }
 
 // 查询所有状态 in (status) 的友链
 func QueryAllFriendLinkINStatus(status []int, fl *[]FriendShipLink) error {
-	return DB.Where("status IN (?)", status).Find(&fl).Error
+	return juneDao.GetDB().Where("status IN (?)", status).Find(&fl).Error
 }
 
 // 根据 FID 判断某条友链是否存在
 func HasFriendLinkByID(fid int) (*FriendShipLink, bool) {
 	fl := new(FriendShipLink)
-	DB.Where("id = ?", fid).Find(&fl)
+	juneDao.GetDB().Where("id = ?", fid).Find(&fl)
 	if fl.Status == 0 && fl.ID == 0 {
 		return nil, false
 	} else {
@@ -31,7 +32,7 @@ func HasFriendLinkByID(fid int) (*FriendShipLink, bool) {
 }
 
 func UpdateFriendStatusByID(fid, status int) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	if err := tx.Error; err != nil {
 		log.Printf("UpdateFriendStatusByID Begin Error, fid = [%v], : [%v]\n", fid, err)
 		return err
@@ -49,7 +50,7 @@ func UpdateFriendStatusByID(fid, status int) error {
 
 // 添加一条友链
 func AddFriendship(fs *FriendShipLink) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	if err := tx.Error; err != nil {
 		log.Printf("AddFriendship Begin Error, FriendShipLink.Name = [%v], : [%v]\n", fs.SiteName, err)
 		return err
@@ -67,7 +68,7 @@ func AddFriendship(fs *FriendShipLink) error {
 }
 
 func DeleteFriendshipByID(fid int) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {

@@ -1,12 +1,11 @@
 package main
 
 import (
-	"JuneGoBlog/src"
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
-	src.InitSetting("./setting.json")
+	doInit()
 }
 
 func main() {

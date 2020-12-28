@@ -1,12 +1,12 @@
 package message
 
 import (
-	junebao_top "JuneGoBlog/src/junebao.top"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthLoginResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 	Token  string
 }
 
@@ -20,10 +20,10 @@ func (r *AuthLoginReq) JSON(ctx *gin.Context) error {
 }
 
 type AuthInfoResp struct {
-	Header   junebao_top.BaseRespHeader `json:"header"`
-	ID       int                        `json:"id"`
-	Username string                     `json:"username"`
-	Permiter int                        `json:"permiter"`
+	Header   juneGin.BaseRespHeader `json:"header"`
+	ID       int                    `json:"id"`
+	Username string                 `json:"username"`
+	Permiter int                    `json:"permiter"`
 }
 
 type AuthInfoReq struct {
@@ -34,7 +34,7 @@ func (r *AuthInfoReq) JSON(ctx *gin.Context) error {
 }
 
 type AuthLogoutResp struct {
-	Header junebao_top.BaseRespHeader `json:"header"`
+	Header juneGin.BaseRespHeader `json:"header"`
 }
 
 type AuthLogoutReq struct {

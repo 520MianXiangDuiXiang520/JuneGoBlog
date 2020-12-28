@@ -1,0 +1,40 @@
+{
+  "others": {
+    "redis": true,
+    "abstractLen": 200,
+    "my_email": "12345@163.com"
+  },
+  "mysql_setting": {
+    "engine": "mysql",
+    "host": "127.0.0.1",
+    "port": 3306,
+    "password": "password",
+    "db_name": "db_name",
+    "user": "root",
+    "max_idle_conn": 32,
+    "max_open_conn": 64,
+    "max_lifetime": 3000,
+    "log_mode": true
+  },
+  "redis_setting": {
+    "host": "127.0.0.1",
+    "port": 8100,
+    "password": "password",
+    "max_idle_conn": 32,
+    "max_open_conn": 64,
+    "max_lifetime": 3000
+  },
+  "smtp_setting": {
+    "host": "smtp.163.com",
+    "username": "12345@163.com",
+    "password": "password",
+    "port": 465
+  },
+  "cors_access_list": [
+    "http://localhost:8081",
+    "http://localhost:8082",
+    "http://127.0.0.1:8889",
+    "http://localhost:8889",
+    "http://localhost:81"
+  ]
+}

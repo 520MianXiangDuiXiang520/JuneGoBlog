@@ -3,7 +3,7 @@ package middleware
 import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
-	junebao_top "JuneGoBlog/src/junebao.top"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,7 +19,7 @@ func AdminPermit(ctx *gin.Context) bool {
 	if u.Permiter != consts.AdminPermission {
 		ctx.Abort()
 		ctx.JSON(http.StatusOK,
-			junebao_top.SuccessRespHeader)
+			juneGin.SuccessRespHeader)
 	}
 	return true
 }

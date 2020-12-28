@@ -2,31 +2,32 @@ package dao
 
 import (
 	"JuneGoBlog/src"
-	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
+	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 )
 
 func hasTalkWithDB(id int) bool {
 	talk := &Talks{}
-	DB.Where("id = ?", id).First(talk)
+	juneDao.GetDB().Where("id = ?", id).First(talk)
 	return talk.ID != 0
 }
 
 func HasTalk(id int) bool {
-	if src.Setting.Redis {
+	if src.GetSetting().Others.Redis {
 		// TODO: BitMap
 	}
 	return hasTalkWithDB(id)
 }
 
 func addTalkWithDB(talk *Talks) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
 			tx.Rollback()
 			msg := fmt.Sprintf("Failed to add comment, rolled back, talk = %v", talk)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 		}
 		tx.Commit()
 	}()
@@ -41,11 +42,11 @@ func AddTalk(talk *Talks) error {
 func QueryTalksByArticleIDLimit(articleID, page, pageSize int) ([]Talks, error) {
 	talks := make([]Talks, 0)
 	offset := (page - 1) * pageSize
-	err := DB.Where("article_id = ?", articleID).Offset(offset).Limit(pageSize).Find(&talks).Error
+	err := juneDao.GetDB().Where("article_id = ?", articleID).Offset(offset).Limit(pageSize).Find(&talks).Error
 	return talks, err
 }
 
 func QueryTalkByTalkID(talkID int) (res Talks, err error) {
-	err = DB.Where("id = ?", talkID).First(&res).Error
+	err = juneDao.GetDB().Where("id = ?", talkID).First(&res).Error
 	return res, err
 }

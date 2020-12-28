@@ -3,19 +3,19 @@ package check
 import (
 	"JuneGoBlog/src/consts"
 	"JuneGoBlog/src/dao"
-	"JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
 	"errors"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func FriendShipListCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func FriendShipListCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	// 无请求参数，不需要校验
 	return http.StatusOK, nil
 }
 
-func FriendShipUnShowListCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func FriendShipUnShowListCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	reqU := req.(*message.FriendUnShowListReq)
 	hopeStatus := [2]int{consts.FriendShipApproving, consts.FriendShipApprovalFail}
 	if reqU.Status != 0 {
@@ -24,17 +24,17 @@ func FriendShipUnShowListCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (
 				return nil, nil
 			}
 		}
-		return junebao_top.ParamErrorRespHeader, errors.New("")
+		return juneGin.ParamErrorRespHeader, errors.New("")
 	}
 	return nil, nil
 }
 
-func FriendApprovalCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func FriendApprovalCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	reqA := req.(*message.FriendApprovalReq)
 
 	// 检查 FriendshipID 是否存在
 	if _, ok := dao.HasFriendLinkByID(reqA.FriendshipID); !ok {
-		return junebao_top.ParamErrorRespHeader, errors.New("NO Result")
+		return juneGin.ParamErrorRespHeader, errors.New("NO Result")
 	}
 	// 检查 result
 	TrueStatus := [2]int{
@@ -46,23 +46,23 @@ func FriendApprovalCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (juneba
 			return nil, nil
 		}
 	}
-	return junebao_top.ParamErrorRespHeader, errors.New("BadParam")
+	return juneGin.ParamErrorRespHeader, errors.New("BadParam")
 }
 
-func FriendApplicationCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func FriendApplicationCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	reqF := req.(*message.FriendApplicationReq)
 	// name 和 Link 必填
 	if reqF.SiteName == "" || reqF.SiteLink == "" {
-		return junebao_top.ParamErrorRespHeader, errors.New("参数异常")
+		return juneGin.ParamErrorRespHeader, errors.New("参数异常")
 	}
 	return nil, nil
 }
 
-func FriendDeleteCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func FriendDeleteCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	reqD := req.(*message.FriendDeleteReq)
 
 	if _, ok := dao.HasFriendLinkByID(reqD.ID); !ok {
-		return junebao_top.ParamErrorRespHeader, errors.New("请求参数错误")
+		return juneGin.ParamErrorRespHeader, errors.New("请求参数错误")
 	}
 	return nil, nil
 }

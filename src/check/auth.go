@@ -2,9 +2,9 @@ package check
 
 import (
 	"JuneGoBlog/src/consts"
-	junebao_top "JuneGoBlog/src/junebao.top"
 	"JuneGoBlog/src/message"
 	"errors"
+	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,18 +18,18 @@ func checkPassword(password string) bool {
 	return len(password) > 0
 }
 
-func AuthLoginCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func AuthLoginCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	request := req.(*message.AuthLoginReq)
 	if checkUsername(request.Username) && checkPassword(request.Password) {
 		return http.StatusOK, nil
 	}
-	return junebao_top.ParamErrorRespHeader, errors.New("")
+	return juneGin.ParamErrorRespHeader, errors.New("")
 }
 
-func AuthInfoCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func AuthInfoCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	return http.StatusOK, nil
 }
 
-func AuthLogoutCheck(ctx *gin.Context, req junebao_top.BaseReqInter) (junebao_top.BaseRespInter, error) {
+func AuthLogoutCheck(ctx *gin.Context, req juneGin.BaseReqInter) (juneGin.BaseRespInter, error) {
 	return http.StatusOK, nil
 }

@@ -2,8 +2,9 @@ package dao
 
 import (
 	"JuneGoBlog/src/consts"
-	"JuneGoBlog/src/junebao.top/utils"
 	"fmt"
+	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
+	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"time"
 )
 
@@ -14,14 +15,14 @@ import (
 **/
 func GetUser(username, password string) (*User, bool) {
 	var user User
-	err := DB.Where("username = ? AND password = ?", username, password).First(&user).Error
+	err := juneDao.GetDB().Where("username = ? AND password = ?", username, password).First(&user).Error
 	return &user, err == nil
 }
 
 func GetUserByToken(token string) (*User, bool) {
 	var ut UserToken
 	var user User
-	err := DB.Where("token = ?", token).First(&ut).Error
+	err := juneDao.GetDB().Where("token = ?", token).First(&ut).Error
 	if err != nil {
 		return nil, false
 	}
@@ -36,12 +37,12 @@ func GetUserByToken(token string) (*User, bool) {
 			return nil, false
 		}
 	}
-	err = DB.Where("id = ?", ut.UserID).First(&user).Error
+	err = juneDao.GetDB().Where("id = ?", ut.UserID).First(&user).Error
 	return &user, err == nil
 }
 
 func DeleteUserTokenByUID(uid int) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
@@ -54,7 +55,7 @@ func DeleteUserTokenByUID(uid int) error {
 }
 
 func DeleteUserTokenByID(id int) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
@@ -67,11 +68,11 @@ func DeleteUserTokenByID(id int) error {
 }
 
 func UpdateTokenExpireTime(id int) (err error) {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	defer func() {
 		if err != nil {
 			msg := fmt.Sprintf("Fail to update token expire time, token id = %v", id)
-			utils.ExceptionLog(err, msg)
+			juneLog.ExceptionLog(err, msg)
 			tx.Rollback()
 		}
 		tx.Commit()
@@ -82,7 +83,7 @@ func UpdateTokenExpireTime(id int) (err error) {
 }
 
 func InsertUserToken(user *User, token string, expire time.Time) error {
-	tx := DB.Begin()
+	tx := juneDao.GetDB().Begin()
 	var err error
 	defer func() {
 		if err != nil {
