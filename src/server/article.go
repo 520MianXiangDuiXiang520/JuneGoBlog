@@ -15,14 +15,24 @@ import (
 	"unicode/utf8"
 )
 
-func getArticleTagsInfo(id int) ([]dao.Tag, error) {
+func getArticleTagsInfo(id int) ([]message.TagInfo, error) {
 	tags := make([]dao.Tag, 0)
+	tagsInfoList := make([]message.TagInfo, 0)
 	if err := dao.QueryAllTagsByArticleID(id, &tags); err != nil {
 		msg := fmt.Sprintf("get all tags by article id fail, %v", id)
 		juneLog.ExceptionLog(err, msg)
-		return nil, err
+		return tagsInfoList, err
 	}
-	return tags, nil
+
+	for _, tagInfo := range tags {
+		tagsInfoList = append(tagsInfoList, message.TagInfo{
+			ID:           tagInfo.ID,
+			Name:         tagInfo.Name,
+			CreateTime:   tagInfo.CreateTime.Unix(),
+			ArticleTotal: tagInfo.Total,
+		})
+	}
+	return tagsInfoList, nil
 }
 
 func ArticleTagsLogic(ctx *gin.Context,
