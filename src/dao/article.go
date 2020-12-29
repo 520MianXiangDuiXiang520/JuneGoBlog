@@ -468,9 +468,11 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	// 更新 article_tag 表
 	tags := make([]Tag, len(tagIDs))
 	for i, tagID := range tagIDs {
+		// 保证 Tag 存在
 		tag, err := QueryTagByID(tagID)
 		if err != nil {
 			return nil, err
@@ -482,7 +484,7 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 			return nil, err
 		}
 		tags[i] = *tag
-		// 不管什么地方发生错误，立刻回滚
+		// 插入一条 ArticleTags 记录
 		err = tx.Create(&ArticleTags{
 			ArticleID: newArticle.ID,
 			TagID:     tagID,
@@ -491,6 +493,10 @@ func AddArticle(newArticle *Article, tagIDs []int) (*Article, error) {
 			msg := fmt.Sprintf("fail to insert new article tag;"+
 				" articleID = %v, tagID = %v", newArticle.ID, tagID)
 			juneLog.ExceptionLog(err, msg)
+			return nil, err
+		}
+		err = lockedUpdateArticleTotal(tx, tagID, 1)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -577,10 +583,24 @@ func deleteArticleFromDB(id int) error {
 		}
 		tx.Commit()
 	}()
+	tags := make([]Tag, 0)
+	err = QueryAllTagsByArticleID(id, &tags)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to query all tags of articles with id = %d", id)
+		juneLog.ExceptionLog(err, msg)
+		return err
+	}
 	// 删除 article 表中的数据
 	err = tx.Where("id = ?", id).Delete(&Article{}).Error
 	// 删除 article_tag 表中的数据
 	err = tx.Where("article_id = ?", id).Delete(&ArticleTags{}).Error
+	// 更新 tag 表中的 total
+	for _, tag := range tags {
+		err := lockedUpdateArticleTotal(tx, tag.ID, -1)
+		if err != nil {
+			return err
+		}
+	}
 	return err
 }
 

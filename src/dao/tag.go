@@ -6,8 +6,10 @@ import (
 	"fmt"
 	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
 	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
+	"github.com/jinzhu/gorm"
 	"reflect"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -171,4 +173,37 @@ func QueryTagByID(id int) (*Tag, error) {
 		return queryTagByIDFromCache(id)
 	}
 	return queryTagByIDFromDB(id)
+}
+
+func QueryTagArticleTotal(db *gorm.DB, tagID int) (int, error) {
+	tag := Tag{}
+	err := db.Model(&Tag{}).Select("total").Where("id = ?", tagID).First(&tag).Error
+	if err != nil {
+		msg := fmt.Sprintf("Fail to select total from tag where id = %d", tagID)
+		juneLog.ExceptionLog(err, msg)
+		return 0, err
+	}
+	return tag.Total, nil
+}
+
+func UpdateTagArticleTotal(db *gorm.DB, tagID, newVal int) error {
+	err := db.Model(&Tag{}).Where("id = ?", tagID).Update("total", newVal).Error
+	if err != nil {
+		msg := fmt.Sprintf("Fail to update Tag.total to %d where id = %d", newVal, tagID)
+		juneLog.ExceptionLog(err, msg)
+	}
+	return err
+}
+
+var updateArticleTotalLock sync.Mutex
+
+// 加锁避免提交覆盖
+func lockedUpdateArticleTotal(tx *gorm.DB, tagID, offset int) error {
+	defer updateArticleTotalLock.Unlock()
+	updateArticleTotalLock.Lock()
+	total, err := QueryTagArticleTotal(tx, tagID)
+	if err != nil {
+		return err
+	}
+	return UpdateTagArticleTotal(tx, tagID, total+offset)
 }

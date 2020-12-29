@@ -17,21 +17,8 @@ func TagListLogin(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespIn
 		juneLog.ExceptionLog(err, msg)
 		return juneGin.SystemErrorRespHeader
 	}
-	tagInfos := make([]message.TagInfo, 0)
-	for _, tag := range tags {
-		articleTotal, err := dao.QueryArticleTotalByTagID(tag.ID)
-		if err != nil {
-			return juneGin.SystemErrorRespHeader
-		}
-		tagInfos = append(tagInfos, message.TagInfo{
-			ID:           tag.ID,
-			ArticleTotal: articleTotal,
-			Name:         tag.Name,
-			CreateTime:   tag.CreateTime.Unix(),
-		})
-	}
-	resp.Tags = tagInfos
-	resp.Total = len(tagInfos)
+	resp.Tags = tags
+	resp.Total = len(tags)
 	resp.Header = juneGin.SuccessRespHeader
 	return resp
 }

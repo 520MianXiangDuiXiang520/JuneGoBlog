@@ -26,7 +26,6 @@ func FriendApprovalLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.Bas
 // 获取友链列表（展示）
 func FriendShipListLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRespInter {
 	resp := message.FriendShipListResp{}
-
 	// 从数据库中读取所有的 friendShip Link 信息
 	friendshipList := make([]dao.FriendShipLink, 0)
 	if err := dao.QueryAllFriendLinkByStatus(consts.FriendShipApprovalPass, &friendshipList); err != nil {

@@ -9,7 +9,7 @@ import (
 type ArticleTagsResp struct {
 	Header juneGin.BaseRespHeader `json:"header"` // 响应头
 	ID     int                    `json:"id"`
-	Tags   []TagInfo              `json:"tags"`
+	Tags   []dao.Tag              `json:"tags"`
 }
 
 type ArticleTagsReq struct {

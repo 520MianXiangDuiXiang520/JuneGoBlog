@@ -23,6 +23,7 @@ type Tag struct {
 	ID         int       `json:"id" gorm:"column:id"`
 	Name       string    `json:"name" gorm:"column:name"`
 	CreateTime time.Time `json:"create_time" gorm:"column:create_time"`
+	Total      int       `json:"article_total" gorm:"total"`
 }
 
 func (Tag) TableName() string {
