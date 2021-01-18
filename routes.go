@@ -10,8 +10,7 @@ import (
 )
 
 func Register(c *gin.Engine) {
-	c.Use(middleware.ApiView(), middleware.CacheMiddleware(),
-		juneMiddle.CorsHandler(src.GetSetting().CorsAccessList))
+	c.Use(middleware.ApiView(), juneMiddle.CorsHandler(src.GetSetting().CorsAccessList))
 	juneGin.URLPatterns(c, "api/article", routes.ArticleRegister)
 	juneGin.URLPatterns(c, "api/tag", routes.TagRegister)
 	juneGin.URLPatterns(c, "api/talking", routes.TalkingRegister)

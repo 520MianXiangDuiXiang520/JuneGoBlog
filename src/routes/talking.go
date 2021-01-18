@@ -3,6 +3,7 @@ package routes
 import (
 	"JuneGoBlog/src/check"
 	"JuneGoBlog/src/message"
+	"JuneGoBlog/src/middleware"
 	"JuneGoBlog/src/server"
 	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ func talkingListRoutes() []gin.HandlerFunc {
 
 func talkingAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneGin.EasyHandler(check.TalkingAddCheck,
 			server.TalkingAddLogic, message.TalkingAddReq{}),
 	}

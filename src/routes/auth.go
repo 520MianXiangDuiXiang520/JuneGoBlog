@@ -18,6 +18,7 @@ func AuthRegister(rg *gin.RouterGroup) {
 
 func authLoginRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneGin.EasyHandler(check.AuthLoginCheck,
 			server.AuthLoginLogic, message.AuthLoginReq{}),
 	}
@@ -25,6 +26,7 @@ func authLoginRoutes() []gin.HandlerFunc {
 
 func authInfoRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneGin.EasyHandler(check.AuthInfoCheck,
 			server.AuthInfoLogic, message.AuthInfoReq{}),
@@ -33,6 +35,7 @@ func authInfoRoutes() []gin.HandlerFunc {
 
 func authLogoutRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneGin.EasyHandler(check.AuthLogoutCheck,
 			server.AuthLogoutLogic, message.AuthLogoutReq{}),

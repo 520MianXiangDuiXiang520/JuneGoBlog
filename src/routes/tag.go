@@ -18,6 +18,7 @@ func TagRegister(rg *gin.RouterGroup) {
 
 func tagDeleteRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		// TODO: 添加删除逻辑
@@ -26,6 +27,7 @@ func tagDeleteRoutes() []gin.HandlerFunc {
 
 func tagAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.TagAddCheck, server.TagAddLogin, message.TagAddReq{}),

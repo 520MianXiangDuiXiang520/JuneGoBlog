@@ -20,6 +20,7 @@ func FriendShipRoutes(rg *gin.RouterGroup) {
 
 func friendshipUnShowRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.FriendShipUnShowListCheck,
@@ -29,6 +30,7 @@ func friendshipUnShowRoutes() []gin.HandlerFunc {
 
 func friendApprovalRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.FriendApprovalCheck,
@@ -38,6 +40,7 @@ func friendApprovalRoutes() []gin.HandlerFunc {
 
 func friendDeleteRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.FriendDeleteCheck,
@@ -47,6 +50,7 @@ func friendDeleteRoutes() []gin.HandlerFunc {
 
 func friendApplicationRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneGin.EasyHandler(check.FriendApplicationCheck,
 			server.FriendApplicationLogic, message.FriendApplicationReq{}),
 	}

@@ -21,6 +21,7 @@ func ArticleRegister(rg *gin.RouterGroup) {
 
 func articleTagsRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneGin.EasyHandler(check.ArticleTagsCheck,
 			server.ArticleTagsLogic, message.ArticleTagsReq{}),
 	}
@@ -35,6 +36,7 @@ func articleDetailRoutes() []gin.HandlerFunc {
 
 func articleListRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneGin.EasyHandler(check.ArticleListCheck,
 			server.ArticleListLogic, message.ArticleListReq{}),
 	}
@@ -42,6 +44,7 @@ func articleListRoutes() []gin.HandlerFunc {
 
 func articleAddRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.ArticleAddCheck,
@@ -51,6 +54,7 @@ func articleAddRoutes() []gin.HandlerFunc {
 
 func articleUpdateRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.ArticleUpdateCheck,
@@ -60,6 +64,7 @@ func articleUpdateRoutes() []gin.HandlerFunc {
 
 func articleDeleteRoutes() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		middleware.NoStoreMiddleware(),
 		juneMiddleware.Auth(middleware.TokenAuth),
 		juneMiddleware.Permiter(middleware.AdminPermit),
 		juneGin.EasyHandler(check.ArticleDeleteCheck,
