@@ -57,7 +57,7 @@ type ArticleAddResp struct {
 
 type ArticleAddReq struct {
 	Title    string `json:"title" check:"not null"`
-	Abstract string `json:"abstract" check:"not null"`
+	Abstract string `json:"abstract"`
 	Text     string `json:"text" check:"not null"`
 	Tags     []int  `json:"tags"`
 }
