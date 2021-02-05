@@ -38,10 +38,18 @@ func TalkingAddLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRes
 	if !dao.HasArticle(request.ArticleID) {
 		return juneGin.ParamErrorRespHeader
 	}
+	parentTalkEmail := ""
 	if request.Type == consts.ChildTalkType {
-		if !dao.HasTalk(request.PTalkID) {
+		pTalk, err := dao.QueryTalkByTalkID(request.PTalkID)
+		if err != nil {
+			msg := fmt.Sprintf("Fail to query parent talk, talkid = %d", request.PTalkID)
+			juneLog.ExceptionLog(err, msg)
+			return juneGin.SystemErrorRespHeader
+		}
+		if pTalk.ID != request.PTalkID {
 			return juneGin.ParamErrorRespHeader
 		}
+		parentTalkEmail = pTalk.Email
 	} else {
 		request.PTalkID = 0
 	}
@@ -66,7 +74,7 @@ func TalkingAddLogic(ctx *gin.Context, req juneGin.BaseReqInter) juneGin.BaseRes
 	// 发送邮件通知
 	go func(r *message.TalkingAddReq) {
 		if r.PTalkID != 0 {
-			err = sendNotification(r)
+			err = sendNotification(r, parentTalkEmail)
 			if err != nil {
 				msg := fmt.Sprintf("send email error! %v", r)
 				juneLog.ExceptionLog(err, msg)
@@ -100,18 +108,18 @@ func sendNotificationToAuthor(r *message.TalkingAddReq) error {
 	})
 }
 
-func sendNotification(r *message.TalkingAddReq) error {
-	subject := "JuneGoBlog 评论回复通知"
+func sendNotification(r *message.TalkingAddReq, parentTalkEmail string) error {
+	subject := "JuneBlog 评论回复通知"
 	st, _ := dao.QueryTalkByTalkID(r.PTalkID)
 	body := util.GetTalkTemplate(map[string]string{
 		"siteLink":    src.GetSetting().Others.SiteLink,
-		"articleLink": fmt.Sprintf("http://39.106.168.39/#/detail/%d", r.ArticleID),
+		"articleLink": fmt.Sprintf("%s%d", src.GetSetting().Others.DetailLink, r.ArticleID),
 		"sourceTalk":  st.Text,
 		"replyTalk":   r.Text,
 	})
 	return juneEmail.Send(&juneEmail.Context{
 		ToList: []juneEmail.Role{
-			{Address: r.Email, Name: r.Username},
+			{Address: parentTalkEmail, Name: r.Username},
 		},
 		Subject: subject,
 		Body:    body,
