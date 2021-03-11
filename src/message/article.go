@@ -73,7 +73,7 @@ type ArticleUpdateResp struct {
 type ArticleUpdateReq struct {
 	ID       int    `json:"id" check:"not null"`
 	Title    string `json:"title" check:"not null"`
-	Abstract string `json:"abstract" check:"not null"`
+	Abstract string `json:"abstract"`
 	Text     string `json:"text" check:"not null"`
 	Tags     []int  `json:"tags"`
 }
