@@ -6,14 +6,17 @@ import (
 	"JuneGoBlog/src/routes"
 	juneGin "github.com/520MianXiangDuiXiang520/GinTools/gin"
 	juneMiddle "github.com/520MianXiangDuiXiang520/GinTools/gin/middleware"
+	middleware2 "github.com/520MianXiangDuiXiang520/ginUtils/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func Register(c *gin.Engine) {
-	c.Use(middleware.BaseThrottled(middleware.SimpleRateThrottle(
-		middleware.ThrottledRuleByUserAgentAndIP, "30/m")),
+	c.Use(
+		juneMiddle.CorsHandler(src.GetSetting().CorsAccessList),
+		middleware2.Throttled(middleware2.SimpleThrottle(
+			middleware2.ThrottledRuleByUserAgentAndIP, "30/m")),
 		middleware.ApiView(),
-		juneMiddle.CorsHandler(src.GetSetting().CorsAccessList))
+	)
 	juneGin.URLPatterns(c, "api/article", routes.ArticleRegister)
 	juneGin.URLPatterns(c, "api/tag", routes.TagRegister)
 	juneGin.URLPatterns(c, "api/talking", routes.TalkingRegister)
