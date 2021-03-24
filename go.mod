@@ -4,7 +4,8 @@ go 1.14
 
 require (
 	github.com/520MianXiangDuiXiang520/GinTools v0.1.0
-	github.com/520MianXiangDuiXiang520/agingMap v0.0.2
+	github.com/520MianXiangDuiXiang520/agingMap v0.0.4
+	github.com/520MianXiangDuiXiang520/ginUtils v0.0.3-pre // indirect
 	github.com/garyburd/redigo v1.6.2
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.5.0
