@@ -14,7 +14,7 @@ func Register(c *gin.Engine) {
 	c.Use(
 		juneMiddle.CorsHandler(src.GetSetting().CorsAccessList),
 		middleware2.Throttled(middleware2.SimpleThrottle(
-			middleware2.ThrottledRuleByUserAgentAndIP, "30/m")),
+			middleware2.ThrottledRuleByUserAgentAndIP, "30/1m")),
 		middleware.ApiView(),
 	)
 	juneGin.URLPatterns(c, "api/article", routes.ArticleRegister)
