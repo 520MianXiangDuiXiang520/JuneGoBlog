@@ -8,7 +8,7 @@ services:
     image: blogapi
     container_name: blogapi
     ports:
-      - 82:8080
+      - 8081:8080
     volumes:
       - ./logs/api:/blog/log
 
