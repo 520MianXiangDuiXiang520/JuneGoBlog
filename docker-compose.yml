@@ -12,18 +12,18 @@ services:
     volumes:
       - ./logs/api:/blog/log
 
-    mysql:
-      network_mode: "bridge"
-      environment:
-        MYSQL_ROOT_PASSWORD: "yourpassword"
-        MYSQL_USER: 'test'
-        MYSQL_PASS: 'yourpassword'
-      image: "mysql"
-      restart: always
-      volumes:
-        - "./db:/var/lib/mysql"
-      ports:
-        - "3306:3306"
+  mysql:
+    network_mode: "bridge"
+    environment:
+      MYSQL_ROOT_PASSWORD: "yourpassword"
+      MYSQL_USER: 'test'
+      MYSQL_PASS: 'yourpassword'
+    image: "mysql"
+    restart: always
+    volumes:
+      - "./db:/var/lib/mysql"
+    ports:
+      - "3306:3306"
 
   redis:
     image: redis:latest
