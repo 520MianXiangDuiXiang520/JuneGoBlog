@@ -24,3 +24,17 @@ services:
         - "./db:/var/lib/mysql"
       ports:
         - "3306:3306"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - 8100:8100
+    networks:
+      - mynetwork
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - ./data:/data:rw
+    command:
+      /bin/bash -c "redis-server /usr/local/etc/redis/redis.conf "
