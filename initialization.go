@@ -5,7 +5,6 @@ import (
 	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
 	juneEmail "github.com/520MianXiangDuiXiang520/GinTools/email"
 	utils "github.com/520MianXiangDuiXiang520/GinTools/log"
-	"github.com/520MianXiangDuiXiang520/GoTools/dao"
 	"github.com/gin-gonic/gin"
 	"io"
 	"log"
@@ -40,7 +39,7 @@ func doInit() {
 			panic("Unable to connect to the redis server")
 		}
 	}
-	dao.GetDB().SetLogger(logger)
+	juneDao.GetDB().SetLogger(logger)
 	// 初始化 SMTP
 	juneEmail.InitSMTPDialer(setting.SMTPSetting.Host, setting.SMTPSetting.Username,
 		setting.SMTPSetting.Password, setting.SMTPSetting.Port)
