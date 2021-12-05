@@ -1,0 +1,15 @@
+version: "3.6"
+services:
+  blogapi:
+    restart: always
+    build:
+      context: ./
+      dockerfile: dockerfile
+    image: blogapi
+    container_name: blogapi
+    ports:
+      - 88:80
+      - 445:443
+      - 8889:8888
+    volumes:
+      - ./logs/api:/blog/log
