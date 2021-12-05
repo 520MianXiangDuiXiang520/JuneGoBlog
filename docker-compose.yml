@@ -31,8 +31,6 @@ services:
     restart: always
     ports:
       - 8100:8100
-    networks:
-      - mynetwork
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf:rw
       - ./data:/data:rw
