@@ -8,6 +8,7 @@ import (
 	juneDao "github.com/520MianXiangDuiXiang520/GinTools/dao"
 	juneLog "github.com/520MianXiangDuiXiang520/GinTools/log"
 	"github.com/garyburd/redigo/redis"
+	"github.com/jinzhu/gorm"
 	"log"
 	"reflect"
 	"strconv"
@@ -20,6 +21,7 @@ import (
 * Time: 2020/8/22 16:21
 **/
 func QueryArticleIDFromCacheByIndex(index int) (int, error) {
+	gorm.Model{}
 	rc := juneDao.GetRedisConn()
 	defer rc.Close()
 	value, err := redis.String(rc.Do("LINDEX", consts.ArticleIDListCache, index))
