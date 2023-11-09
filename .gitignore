@@ -3,3 +3,4 @@
 /monitor/
 #*.json
 setting.json
+/base_changed

@@ -1,0 +1,19 @@
+
+version: '3.6'
+services:
+  mongodb:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    volumes:
+      - ~/data/blog/data/mongo:/data/db
+      - ~/data/blog/config/mongod.conf:/etc/mongod.conf
+      - ~/data/blog/log/mongo:/var/log/mongodb
+    command: -config /etc/mongod.conf
+
+
+networks:
+  docker:
+    external: true

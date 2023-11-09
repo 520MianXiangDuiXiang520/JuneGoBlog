@@ -1,0 +1,13 @@
+{
+  "db": {
+    "mongo": {
+      "uri": "mongodb://localhost:27017",
+      "compressors": ["snappy", "zlib", "zstd"],
+      "conn_timeout": 3,
+      "max_connecting": 100,
+      "max_pool_size": 20,
+      "min_pool_size": 4
+    },
+    "redis": {}
+  }
+}
